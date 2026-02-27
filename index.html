@@ -4,1050 +4,946 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Field Attendance System</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --blue-dark: #0a2540;
-    --blue-mid: #1a4b8c;
-    --blue-bright: #2563eb;
-    --blue-light: #dbeafe;
-    --green-dark: #065f46;
-    --green-mid: #059669;
-    --green-bright: #10b981;
-    --green-light: #d1fae5;
-    --white: #ffffff;
-    --off-white: #f8fafc;
-    --text-dark: #0f172a;
-    --text-mid: #334155;
-    --text-light: #64748b;
-    --border: #e2e8f0;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-    --shadow-md: 0 4px 16px rgba(10,37,64,0.12);
-    --shadow-lg: 0 12px 40px rgba(10,37,64,0.18);
-    --radius: 16px;
-    --radius-sm: 10px;
-  }
-
+  /* ── RESET & BASE ── */
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
+  :root {
+    --blue-dark:   #0a2540;
+    --blue-mid:    #1a4b8c;
+    --blue:        #2563eb;
+    --blue-light:  #dbeafe;
+    --green:       #059669;
+    --green-light: #d1fae5;
+    --white:       #ffffff;
+    --bg:          #f1f5f9;
+    --text:        #0f172a;
+    --text-mid:    #475569;
+    --text-soft:   #94a3b8;
+    --border:      #e2e8f0;
+    --radius:      14px;
+    --radius-sm:   8px;
+    --font:        'Inter', sans-serif;
+  }
+
   body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--off-white);
-    color: var(--text-dark);
+    font-family: var(--font);
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
     min-height: 100vh;
     overflow-x: hidden;
   }
 
-  /* HEADER */
+  /* ── HEADER ── */
   .header {
-    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 60%, var(--blue-bright) 100%);
-    padding: 18px 20px 28px;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 180px; height: 180px;
-    background: rgba(16,185,129,0.15);
-    border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 55%, var(--blue) 100%);
+    padding: 16px 16px 0;
+    position: relative; overflow: hidden;
   }
   .header::after {
     content: '';
-    position: absolute;
-    bottom: -30px; left: 30px;
-    width: 120px; height: 120px;
-    background: rgba(37,99,235,0.2);
+    position: absolute; top: -50px; right: -50px;
+    width: 160px; height: 160px;
+    background: rgba(16,185,129,0.12);
     border-radius: 50%;
   }
-  .header-inner {
+  .header-row {
+    display: flex; align-items: center; gap: 12px;
     position: relative; z-index: 1;
-    display: flex; align-items: center; gap: 14px;
   }
-  .logo-circle {
-    width: 48px; height: 48px;
-    background: linear-gradient(135deg, var(--green-bright), var(--green-mid));
+  .logo {
+    width: 44px; height: 44px; flex-shrink: 0;
+    background: linear-gradient(135deg, #10b981, #059669);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    box-shadow: 0 4px 12px rgba(16,185,129,0.4);
-    flex-shrink: 0;
+    font-size: 20px;
+    box-shadow: 0 3px 10px rgba(16,185,129,0.35);
   }
-  .header-title { color: white; }
-  .header-title h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px; font-weight: 800;
-    letter-spacing: -0.3px;
-    line-height: 1.2;
+  .header-text h1 {
+    font-size: 18px; font-weight: 700;
+    color: #fff; letter-spacing: -0.2px;
   }
-  .header-title p { font-size: 12px; opacity: 0.7; margin-top: 2px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-
-  /* LIVE DATETIME BAR */
-  .datetime-bar {
-    background: rgba(255,255,255,0.08);
-    border-top: 1px solid rgba(255,255,255,0.12);
-    padding: 10px 20px;
-    display: flex; gap: 16px;
+  .header-text p {
+    font-size: 11px; font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin-top: 1px;
+  }
+  .dt-bar {
+    display: flex; gap: 18px;
+    padding: 10px 0 14px;
     position: relative; z-index: 1;
   }
-  .dt-item { display: flex; align-items: center; gap: 6px; color: white; font-size: 13px; font-weight: 700; }
-  .dt-item span:first-child { font-size: 15px; }
+  .dt-bar span {
+    font-size: 13px; font-weight: 500;
+    color: rgba(255,255,255,0.85);
+  }
 
-  /* TAB NAV */
-  .tab-nav {
-    background: var(--white);
+  /* ── LOCATION BANNER (top of page) ── */
+  .loc-banner {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 16px;
+    font-size: 12px; font-weight: 500;
+    background: #fef3c7; color: #92400e;
+    border-bottom: 1px solid #fde68a;
+  }
+  .loc-banner.ok  { background: var(--green-light); color: #065f46; border-color: #a7f3d0; }
+  .loc-banner.err { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+  .loc-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor; flex-shrink: 0;
+    animation: blink 1.4s infinite;
+  }
+  .loc-banner.ok  .loc-dot,
+  .loc-banner.err .loc-dot { animation: none; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+  /* ── TAB NAV ── */
+  .tabs {
     display: flex;
-    border-bottom: 2px solid var(--border);
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
     position: sticky; top: 0; z-index: 100;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   }
-  .tab-btn {
-    flex: 1; padding: 14px 8px;
+  .tab {
+    flex: 1; padding: 13px 8px;
     border: none; background: none;
-    font-family: 'Nunito', sans-serif;
-    font-size: 13px; font-weight: 700;
-    color: var(--text-light);
-    cursor: pointer;
+    font-family: var(--font);
+    font-size: 13px; font-weight: 600;
+    color: var(--text-soft); cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 6px;
-    transition: all 0.2s;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color .18s, border-color .18s;
   }
-  .tab-btn.active {
-    color: var(--blue-bright);
-    border-bottom-color: var(--blue-bright);
-  }
-  .tab-btn span { font-size: 16px; }
+  .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
 
-  /* SECTIONS */
-  .section { display: none; padding: 20px 16px 100px; animation: fadeUp 0.3s ease; }
+  /* ── SECTIONS ── */
+  .section { display: none; padding: 16px 14px 90px; animation: fadeUp .25s ease; }
   .section.active { display: block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  /* CARD */
+  /* ── CARD ── */
   .card {
     background: var(--white);
     border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: var(--shadow-sm);
+    padding: 16px;
+    margin-bottom: 14px;
     border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
-  .card-header {
+  .card-head {
     display: flex; align-items: center; gap: 10px;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
+    padding-bottom: 12px; margin-bottom: 14px;
     border-bottom: 1px solid var(--border);
   }
-  .card-icon {
-    width: 36px; height: 36px;
-    border-radius: 10px;
+  .card-ico {
+    width: 34px; height: 34px; border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
+    font-size: 17px; flex-shrink: 0;
   }
-  .card-icon.blue { background: var(--blue-light); }
-  .card-icon.green { background: var(--green-light); }
-  .card-title { font-size: 15px; font-weight: 800; color: var(--text-dark); }
-  .card-subtitle { font-size: 11px; color: var(--text-light); font-weight: 600; margin-top: 1px; }
+  .ico-blue  { background: var(--blue-light); }
+  .ico-green { background: var(--green-light); }
+  .card-head-text .title    { font-size: 14px; font-weight: 600; color: var(--text); }
+  .card-head-text .subtitle { font-size: 11px; font-weight: 400; color: var(--text-soft); margin-top: 1px; }
 
-  /* FORM */
-  .form-group { margin-bottom: 14px; }
-  .form-label {
+  /* ── FORM ── */
+  .fg { margin-bottom: 12px; }
+  .fg label {
     display: block;
-    font-size: 12px; font-weight: 700;
+    font-size: 12px; font-weight: 600;
     color: var(--text-mid);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    margin-bottom: 5px;
   }
-  .form-label .req { color: var(--blue-bright); margin-left: 3px; }
-  .form-input {
+  .fg label .req { color: var(--blue); }
+  .fg label .opt { font-weight: 400; color: var(--text-soft); font-size: 11px; }
+  input.fi {
     width: 100%;
-    padding: 12px 14px;
-    border: 2px solid var(--border);
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
     border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px; font-weight: 600;
-    color: var(--text-dark);
-    background: var(--off-white);
-    transition: all 0.2s;
+    font-family: var(--font);
+    font-size: 14px; font-weight: 400;
+    color: var(--text);
+    background: var(--bg);
     outline: none;
+    transition: border-color .15s, box-shadow .15s;
   }
-  .form-input:focus {
-    border-color: var(--blue-bright);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-  }
-  .form-input.readonly {
-    background: var(--blue-light);
-    color: var(--blue-dark);
-    border-color: transparent;
-    cursor: default;
-  }
-  .form-hint { font-size: 11px; color: var(--text-light); margin-top: 4px; font-weight: 600; }
+  input.fi:focus { border-color: var(--blue); background: var(--white); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+  input.fi.ro    { background: var(--blue-light); color: var(--blue-dark); border-color: transparent; cursor: default; font-weight: 500; }
 
-  /* CAMERA WIDGET */
-  .camera-widget {
-    border: 2px dashed var(--border);
+  /* ── CAMERA ── */
+  .cam-wrap {
+    border: 1.5px dashed var(--border);
     border-radius: var(--radius);
-    overflow: hidden;
-    position: relative;
-    background: #f1f5f9;
-    transition: border-color 0.2s;
+    overflow: hidden; background: #f8fafc;
+    transition: border-color .2s;
   }
-  .camera-widget.active-cam { border-color: var(--green-bright); border-style: solid; }
-  .camera-placeholder {
+  .cam-wrap.live { border-color: #10b981; border-style: solid; }
+  .cam-placeholder {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    padding: 32px 20px;
-    gap: 10px;
-    cursor: pointer;
+    padding: 28px 16px; gap: 8px; cursor: pointer;
   }
-  .cam-icon { font-size: 40px; }
-  .cam-text { font-size: 13px; font-weight: 700; color: var(--text-mid); text-align: center; }
-  .cam-sub { font-size: 11px; color: var(--text-light); font-weight: 600; }
-
-  .camera-preview-area { position: relative; }
-  video {
-    width: 100%; display: block;
-    background: #000;
-  }
-  .video-portrait { height: 320px; object-fit: cover; }
-  .video-landscape { height: 220px; object-fit: cover; }
-
-  .cam-controls {
+  .cam-placeholder .icon { font-size: 36px; }
+  .cam-placeholder .lbl  { font-size: 13px; font-weight: 600; color: var(--text-mid); }
+  .cam-placeholder .sub  { font-size: 11px; color: var(--text-soft); }
+  video { width: 100%; display: block; background: #000; }
+  .vp { height: 300px; object-fit: cover; }
+  .vl { height: 210px; object-fit: cover; }
+  .cam-ctrl {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 14px;
-    background: rgba(10,37,64,0.85);
+    padding: 10px 12px;
+    background: rgba(10,37,64,.88);
   }
-  .cam-btn {
-    padding: 8px 16px;
-    border: none; border-radius: 8px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 12px; font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s;
+  .cbtn {
+    border: none; border-radius: 7px; cursor: pointer;
+    font-family: var(--font); font-weight: 600; font-size: 12px;
+    padding: 8px 14px; transition: opacity .15s;
   }
-  .cam-btn:active { transform: scale(0.96); }
-  .cam-btn-capture {
-    background: var(--green-bright); color: white;
-    padding: 10px 24px; font-size: 13px;
-    border-radius: 50px;
-    box-shadow: 0 4px 12px rgba(16,185,129,0.4);
-  }
-  .cam-btn-switch { background: rgba(255,255,255,0.15); color: white; font-size: 16px; padding: 8px 12px; border-radius: 8px; }
-  .cam-btn-retake { background: rgba(255,255,255,0.15); color: white; }
-
-  .photo-preview { position: relative; }
-  .photo-preview img { width: 100%; display: block; }
+  .cbtn:active { opacity: .8; }
+  .cbtn-cap  { background: #10b981; color: #fff; padding: 9px 22px; border-radius: 50px; font-size: 13px; }
+  .cbtn-sw   { background: rgba(255,255,255,.15); color: #fff; font-size: 15px; }
+  .cbtn-ret  { background: rgba(255,255,255,.15); color: #fff; }
+  .photo-wrap { position: relative; }
+  .photo-wrap img { width: 100%; display: block; }
   .photo-badge {
     position: absolute; top: 8px; right: 8px;
-    background: var(--green-bright); color: white;
-    padding: 4px 10px; border-radius: 20px;
-    font-size: 11px; font-weight: 700;
-  }
-
-  /* SUBMIT BTN */
-  .submit-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, var(--blue-bright), var(--blue-mid));
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    font-family: 'Nunito', sans-serif;
-    font-size: 16px; font-weight: 800;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 6px 20px rgba(37,99,235,0.35);
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    letter-spacing: 0.3px;
-  }
-  .submit-btn:active { transform: scale(0.98); }
-  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-  .submit-btn.loading { background: var(--text-light); }
-
-  /* ATTENDANCE TABLE */
-  .score-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px; margin-bottom: 16px;
-  }
-  .score-card {
-    background: var(--white);
-    border-radius: var(--radius-sm);
-    padding: 14px 10px;
-    text-align: center;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-  }
-  .score-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 28px; font-weight: 800;
-    line-height: 1;
-  }
-  .score-num.present { color: var(--green-mid); }
-  .score-num.absent { color: #ef4444; }
-  .score-num.neutral { color: var(--blue-bright); }
-  .score-label { font-size: 10px; font-weight: 700; color: var(--text-light); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-  .filter-row {
-    display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;
-  }
-  .filter-btn {
-    padding: 7px 14px;
-    border: 2px solid var(--border);
-    border-radius: 50px;
-    background: white;
-    font-family: 'Nunito', sans-serif;
-    font-size: 12px; font-weight: 700;
-    color: var(--text-mid);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .filter-btn.active {
-    background: var(--blue-bright); color: white; border-color: var(--blue-bright);
-  }
-  .custom-range { display: none; gap: 8px; align-items: center; width: 100%; margin-top: 4px; }
-  .custom-range.show { display: flex; }
-  .custom-range input { flex: 1; padding: 8px 10px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 600; }
-
-  .att-table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th {
-    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
-    color: white; padding: 10px 12px;
-    text-align: left; font-weight: 700; font-size: 11px;
-    text-transform: uppercase; letter-spacing: 0.5px;
-    white-space: nowrap;
-  }
-  td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: var(--off-white); }
-  .badge {
-    display: inline-flex; align-items: center;
+    background: #10b981; color: #fff;
     padding: 3px 10px; border-radius: 20px;
-    font-size: 11px; font-weight: 700;
+    font-size: 11px; font-weight: 600;
   }
-  .badge-present { background: var(--green-light); color: var(--green-dark); }
-  .badge-absent { background: #fee2e2; color: #991b1b; }
 
-  .empty-state {
-    text-align: center; padding: 40px 20px;
-    color: var(--text-light);
+  /* ── SUBMIT ── */
+  .submit-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--blue), var(--blue-mid));
+    color: #fff; border: none; border-radius: var(--radius);
+    font-family: var(--font); font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: opacity .2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 14px rgba(37,99,235,.3);
   }
-  .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
-  .empty-state p { font-size: 14px; font-weight: 600; }
+  .submit-btn:disabled { opacity: .55; cursor: not-allowed; }
 
-  /* MODAL */
-  .modal-overlay {
+  /* ── SCORECARD ── */
+  .score-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 10px;
+    margin-bottom: 14px;
+  }
+  .sc {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 8px; text-align: center;
+  }
+  .sc .num { font-size: 26px; font-weight: 700; line-height: 1; }
+  .sc .num.p { color: var(--green); }
+  .sc .num.n { color: var(--blue); }
+  .sc .lbl   { font-size: 10px; font-weight: 600; color: var(--text-soft); margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
+
+  /* ── FILTER ── */
+  .filter-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .fbtn {
+    padding: 6px 14px; border: 1.5px solid var(--border);
+    border-radius: 50px; background: var(--white);
+    font-family: var(--font); font-size: 12px; font-weight: 500;
+    color: var(--text-mid); cursor: pointer; transition: all .15s;
+  }
+  .fbtn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .crange { display: none; gap: 8px; align-items: center; width: 100%; margin-top: 6px; }
+  .crange.show { display: flex; }
+  .crange input { flex:1; padding:7px 10px; border:1.5px solid var(--border); border-radius:7px; font-family:var(--font); font-size:12px; }
+  .crange button { padding:8px 14px; background:var(--blue); color:#fff; border:none; border-radius:7px; font-family:var(--font); font-size:12px; font-weight:600; cursor:pointer; }
+
+  /* ── TABLE ── */
+  .tbl-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: var(--blue-dark);
+    color: #fff; padding: 9px 10px;
+    text-align: left; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .5px; white-space: nowrap;
+  }
+  td {
+    padding: 9px 10px; border-bottom: 1px solid var(--border);
+    font-size: 13px; font-weight: 400; color: var(--text);
+    vertical-align: middle; white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .badge {
+    display: inline-block; padding: 2px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .bp { background: var(--green-light); color: #065f46; }
+
+  /* ── MISC ── */
+  .empty {
+    text-align: center; padding: 36px 16px; color: var(--text-soft);
+  }
+  .empty .ei { font-size: 40px; margin-bottom: 10px; }
+  .empty p   { font-size: 13px; }
+
+  .fp-note {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--blue-light); border: 1px solid #bfdbfe;
+    border-radius: var(--radius-sm); padding: 10px 12px;
+    font-size: 12px; font-weight: 500; color: #1e40af;
+    margin-bottom: 14px;
+  }
+
+  /* ── MODAL ── */
+  .overlay {
     position: fixed; inset: 0;
-    background: rgba(10,37,64,0.6);
-    backdrop-filter: blur(4px);
-    z-index: 1000;
-    display: none; align-items: center; justify-content: center;
-    padding: 20px;
-    animation: fadeIn 0.2s ease;
+    background: rgba(10,37,64,.55); backdrop-filter: blur(3px);
+    z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
   }
-  .modal-overlay.show { display: flex; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
+  .overlay.show { display: flex; }
   .modal {
-    background: white;
-    border-radius: 20px;
-    padding: 28px 24px;
-    max-width: 380px; width: 100%;
-    box-shadow: var(--shadow-lg);
-    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    background: var(--white); border-radius: 18px;
+    padding: 24px 20px; max-width: 360px; width: 100%;
+    box-shadow: 0 16px 48px rgba(0,0,0,.2);
+    animation: pop .28s cubic-bezier(.34,1.56,.64,1);
   }
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(0.85); }
-    to { opacity: 1; transform: scale(1); }
+  @keyframes pop { from{opacity:0;transform:scale(.85)} to{opacity:1;transform:scale(1)} }
+  .modal .m-icon  { font-size: 48px; text-align: center; }
+  .modal .m-title { font-size: 18px; font-weight: 700; text-align: center; margin: 8px 0 16px; color: var(--text); }
+  .m-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
   }
-  .modal-icon { font-size: 52px; text-align: center; margin-bottom: 8px; }
-  .modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; text-align: center; color: var(--text-dark); margin-bottom: 16px; }
-  .modal-detail { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
-  .modal-detail:last-of-type { border-bottom: none; }
-  .modal-detail .label { font-size: 12px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
-  .modal-detail .value { font-size: 14px; font-weight: 700; color: var(--text-dark); text-align: right; max-width: 200px; }
-  .modal-close {
-    width: 100%; margin-top: 20px;
-    padding: 13px;
-    background: linear-gradient(135deg, var(--green-bright), var(--green-mid));
-    color: white; border: none; border-radius: var(--radius-sm);
-    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(16,185,129,0.35);
+  .m-row:last-of-type { border: none; }
+  .m-row .lbl { font-size: 11px; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: .5px; }
+  .m-row .val { font-size: 14px; font-weight: 600; color: var(--text); text-align: right; max-width: 200px; }
+  .m-close {
+    width: 100%; margin-top: 18px; padding: 12px;
+    background: linear-gradient(135deg, #10b981, var(--green));
+    color: #fff; border: none; border-radius: var(--radius-sm);
+    font-family: var(--font); font-size: 14px; font-weight: 600;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(5,150,105,.3);
   }
 
-  /* LOADING SPINNER */
-  .spinner {
-    width: 20px; height: 20px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
+  /* ── TOAST ── */
   .toast {
-    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-    background: var(--blue-dark); color: white;
-    padding: 10px 20px; border-radius: 50px;
-    font-size: 13px; font-weight: 700;
-    z-index: 999;
-    opacity: 0; transition: opacity 0.3s;
-    pointer-events: none; white-space: nowrap;
+    position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%);
+    background: var(--blue-dark); color: #fff;
+    padding: 9px 18px; border-radius: 50px;
+    font-size: 13px; font-weight: 500; z-index: 300;
+    opacity: 0; transition: opacity .25s; pointer-events: none; white-space: nowrap;
   }
   .toast.show { opacity: 1; }
 
-  .location-status {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 14px;
-    background: var(--blue-light);
-    border-radius: var(--radius-sm);
-    margin-top: 8px;
-    font-size: 12px; font-weight: 700; color: var(--blue-dark);
+  /* ── SPINNER ── */
+  .spin {
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: rot .6s linear infinite;
   }
-  .location-status.success { background: var(--green-light); color: var(--green-dark); }
-  .location-status.error { background: #fee2e2; color: #991b1b; }
-  .loc-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 1.5s infinite; flex-shrink: 0; }
-  .location-status.success .loc-dot, .location-status.error .loc-dot { animation: none; }
-  @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
-
-  /* ATTENDANCE FINGERPRINT NOTICE */
-  .fp-notice {
-    background: linear-gradient(135deg, var(--blue-light), var(--green-light));
-    border: 1px solid var(--blue-bright);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
-    margin-bottom: 14px;
-    font-size: 12px; font-weight: 700; color: var(--blue-dark);
-    display: flex; align-items: center; gap: 8px;
-  }
-
-  /* RESPONSIVE */
-  @media (max-width: 400px) {
-    .score-grid { grid-template-columns: repeat(3, 1fr); }
-    .score-num { font-size: 24px; }
-  }
+  @keyframes rot { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <div class="header">
-  <div class="header-inner">
-    <div class="logo-circle">⚡</div>
-    <div class="header-title">
+  <div class="header-row">
+    <div class="logo">⚡</div>
+    <div class="header-text">
       <h1>Field Attendance</h1>
       <p>Site Check-In System</p>
     </div>
   </div>
-  <div class="datetime-bar">
-    <div class="dt-item"><span>📅</span><span id="liveDate">--</span></div>
-    <div class="dt-item"><span>⏰</span><span id="liveTime">--</span></div>
+  <div class="dt-bar">
+    <span id="liveDate">--</span>
+    <span>|</span>
+    <span id="liveTime">--</span>
   </div>
 </div>
 
-<!-- TAB NAV -->
-<div class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('checkin')"><span>✅</span> Check In</button>
-  <button class="tab-btn" onclick="switchTab('attendance')"><span>📋</span> My Attendance</button>
+<!-- LOCATION BANNER -->
+<div class="loc-banner" id="locBanner">
+  <div class="loc-dot"></div>
+  <span id="locMsg">Getting your location...</span>
 </div>
 
-<!-- CHECK IN SECTION -->
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('checkin',this)">✅ Check In</button>
+  <button class="tab"        onclick="switchTab('attendance',this)">📋 My Attendance</button>
+</div>
+
+<!-- ════ CHECK IN SECTION ════ -->
 <div id="tab-checkin" class="section active">
 
-  <!-- Employee Info Card -->
+  <!-- Employee Info -->
   <div class="card">
-    <div class="card-header">
-      <div class="card-icon blue">👤</div>
-      <div>
-        <div class="card-title">Employee Details</div>
-        <div class="card-subtitle">Fill in your information</div>
+    <div class="card-head">
+      <div class="card-ico ico-blue">👤</div>
+      <div class="card-head-text">
+        <div class="title">Employee Details</div>
+        <div class="subtitle">Fill in your information below</div>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Date <span class="req">●</span></label>
-      <input type="text" id="fieldDate" class="form-input readonly" readonly>
+
+    <div class="fg">
+      <label>Date</label>
+      <input id="fDate" class="fi ro" readonly>
     </div>
-    <div class="form-group">
-      <label class="form-label">Time <span class="req">●</span></label>
-      <input type="text" id="fieldTime" class="form-input readonly" readonly>
+    <div class="fg">
+      <label>Time</label>
+      <input id="fTime" class="fi ro" readonly>
     </div>
-    <div class="form-group">
-      <label class="form-label">Employee Name <span class="req">*</span></label>
-      <input type="text" id="empName" class="form-input" placeholder="Enter your full name" required>
+    <div class="fg">
+      <label>Employee Name <span class="req">*</span></label>
+      <input id="empName" class="fi" type="text" placeholder="Enter your full name">
     </div>
-    <div class="form-group">
-      <label class="form-label">Site Details <span class="req">*</span></label>
-      <input type="text" id="siteDetails" class="form-input" placeholder="e.g. AMPIN:ICR / MCR / SWITCHYARD / WTG" required>
+    <div class="fg">
+      <label>Site Details <span class="req">*</span></label>
+      <input id="siteDetails" class="fi" type="text" placeholder="e.g. AMPIN : ICR / MCR / SWITCHYARD / WTG">
     </div>
-    <div class="form-group">
-      <label class="form-label">Number of Labour <small style="font-weight:600; color:var(--text-light);">(Optional)</small></label>
-      <input type="number" id="numLabour" class="form-input" placeholder="Enter count (if applicable)" min="0" oninput="toggleLabourPhoto()">
+    <div class="fg" style="margin-bottom:0">
+      <label>No. of Labour <span class="opt">(optional)</span></label>
+      <input id="numLabour" class="fi" type="number" min="0" placeholder="Enter count" oninput="toggleLabourPhoto()">
     </div>
   </div>
 
-  <!-- Selfie Card -->
+  <!-- Selfie -->
   <div class="card">
-    <div class="card-header">
-      <div class="card-icon green">🤳</div>
-      <div>
-        <div class="card-title">Selfie Photo</div>
-        <div class="card-subtitle">Portrait mode • Camera only</div>
+    <div class="card-head">
+      <div class="card-ico ico-green">🤳</div>
+      <div class="card-head-text">
+        <div class="title">Selfie Photo</div>
+        <div class="subtitle">Portrait · Camera only · No upload</div>
       </div>
     </div>
-    <div class="camera-widget" id="selfieWidget">
-      <div class="camera-placeholder" id="selfiePlaceholder" onclick="startCamera('selfie')">
-        <div class="cam-icon">📷</div>
-        <div class="cam-text">Tap to Open Camera</div>
-        <div class="cam-sub">Portrait orientation</div>
+    <div class="cam-wrap" id="selfieWrap">
+      <div class="cam-placeholder" id="selfiePH" onclick="startCam('selfie')">
+        <div class="icon">📷</div>
+        <div class="lbl">Tap to Open Camera</div>
+        <div class="sub">Portrait orientation</div>
       </div>
-      <div class="camera-preview-area" id="selfiePreviewArea" style="display:none;">
-        <video id="selfieVideo" class="video-portrait" autoplay playsinline muted></video>
-        <div class="cam-controls">
-          <button class="cam-btn cam-btn-switch" onclick="switchCamera('selfie')" title="Switch Camera">🔄</button>
-          <button class="cam-btn cam-btn-capture" onclick="capturePhoto('selfie')">📸 Capture</button>
-          <button class="cam-btn cam-btn-retake" onclick="stopCamera('selfie')">✕ Close</button>
+      <div id="selfiePreview" style="display:none">
+        <video id="selfieVid" class="vp" autoplay playsinline muted></video>
+        <div class="cam-ctrl">
+          <button class="cbtn cbtn-sw" onclick="switchCam('selfie')">🔄</button>
+          <button class="cbtn cbtn-cap" onclick="capture('selfie')">📸 Capture</button>
+          <button class="cbtn cbtn-ret" onclick="stopCam('selfie')">✕</button>
         </div>
       </div>
-      <div class="photo-preview" id="selfiePhotoPreview" style="display:none;">
-        <img id="selfiePhotoImg" alt="Selfie">
+      <div class="photo-wrap" id="selfiePhoto" style="display:none">
+        <img id="selfieImg" alt="Selfie">
         <div class="photo-badge">✓ Captured</div>
-        <div class="cam-controls">
+        <div class="cam-ctrl">
           <div></div>
-          <button class="cam-btn cam-btn-retake" onclick="retakePhoto('selfie')">🔄 Retake</button>
+          <button class="cbtn cbtn-ret" onclick="retake('selfie')">🔄 Retake</button>
           <div></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Labour Photo Card (conditional) -->
-  <div class="card" id="labourPhotoCard" style="display:none;">
-    <div class="card-header">
-      <div class="card-icon blue">👷</div>
-      <div>
-        <div class="card-title">Labour Photo</div>
-        <div class="card-subtitle">Landscape mode • Group capture</div>
+  <!-- Labour Photo (conditional) -->
+  <div class="card" id="labourCard" style="display:none">
+    <div class="card-head">
+      <div class="card-ico ico-blue">👷</div>
+      <div class="card-head-text">
+        <div class="title">Labour Photo</div>
+        <div class="subtitle">Landscape · Group shot · Camera only</div>
       </div>
     </div>
-    <div class="camera-widget" id="labourWidget">
-      <div class="camera-placeholder" id="labourPlaceholder" onclick="startCamera('labour')">
-        <div class="cam-icon">📸</div>
-        <div class="cam-text">Tap to Capture Labour Photo</div>
-        <div class="cam-sub">Landscape orientation • Wide angle for groups</div>
+    <div class="cam-wrap" id="labourWrap">
+      <div class="cam-placeholder" id="labourPH" onclick="startCam('labour')">
+        <div class="icon">📸</div>
+        <div class="lbl">Tap to Capture Labour Photo</div>
+        <div class="sub">Landscape — wide frame for groups</div>
       </div>
-      <div class="camera-preview-area" id="labourPreviewArea" style="display:none;">
-        <video id="labourVideo" class="video-landscape" autoplay playsinline muted></video>
-        <div class="cam-controls">
-          <button class="cam-btn cam-btn-switch" onclick="switchCamera('labour')" title="Switch Camera">🔄</button>
-          <button class="cam-btn cam-btn-capture" onclick="capturePhoto('labour')">📸 Capture</button>
-          <button class="cam-btn cam-btn-retake" onclick="stopCamera('labour')">✕ Close</button>
+      <div id="labourPreview" style="display:none">
+        <video id="labourVid" class="vl" autoplay playsinline muted></video>
+        <div class="cam-ctrl">
+          <button class="cbtn cbtn-sw" onclick="switchCam('labour')">🔄</button>
+          <button class="cbtn cbtn-cap" onclick="capture('labour')">📸 Capture</button>
+          <button class="cbtn cbtn-ret" onclick="stopCam('labour')">✕</button>
         </div>
       </div>
-      <div class="photo-preview" id="labourPhotoPreview" style="display:none;">
-        <img id="labourPhotoImg" alt="Labour Photo">
+      <div class="photo-wrap" id="labourPhoto" style="display:none">
+        <img id="labourImg" alt="Labour Photo">
         <div class="photo-badge">✓ Captured</div>
-        <div class="cam-controls">
+        <div class="cam-ctrl">
           <div></div>
-          <button class="cam-btn cam-btn-retake" onclick="retakePhoto('labour')">🔄 Retake</button>
+          <button class="cbtn cbtn-ret" onclick="retake('labour')">🔄 Retake</button>
           <div></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Location Card -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-icon green">📍</div>
-      <div>
-        <div class="card-title">Location</div>
-        <div class="card-subtitle">Auto-captured on submit</div>
-      </div>
-    </div>
-    <div id="locationStatus" class="location-status">
-      <div class="loc-dot"></div>
-      <span>Location will be captured when you submit</span>
-    </div>
-  </div>
-
-  <!-- Submit -->
   <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">
-    <span>🚀</span> Submit Attendance
+    🚀 Submit Attendance
   </button>
 </div>
 
-<!-- MY ATTENDANCE SECTION -->
+<!-- ════ MY ATTENDANCE SECTION ════ -->
 <div id="tab-attendance" class="section">
-  <div class="fp-notice">
-    <span>🔒</span>
-    <span>Showing records for this device only</span>
-  </div>
+  <div class="fp-note">🔒 Showing records for this device only</div>
 
   <!-- Scorecard -->
   <div class="card">
-    <div class="card-header">
-      <div class="card-icon blue">🏆</div>
-      <div>
-        <div class="card-title">Scorecard</div>
-        <div class="card-subtitle">Your attendance overview</div>
+    <div class="card-head">
+      <div class="card-ico ico-blue">🏆</div>
+      <div class="card-head-text">
+        <div class="title">Scorecard</div>
+        <div class="subtitle">Your attendance at a glance</div>
       </div>
     </div>
     <div class="score-grid">
-      <div class="score-card">
-        <div class="score-num present" id="scoreToday">-</div>
-        <div class="score-label">Today</div>
-      </div>
-      <div class="score-card">
-        <div class="score-num neutral" id="scoreWeek">-</div>
-        <div class="score-label">This Week</div>
-      </div>
-      <div class="score-card">
-        <div class="score-num neutral" id="scoreMonth">-</div>
-        <div class="score-label">This Month</div>
-      </div>
+      <div class="sc"><div class="num p" id="sToday">-</div><div class="lbl">Today</div></div>
+      <div class="sc"><div class="num n" id="sWeek">-</div><div class="lbl">This Week</div></div>
+      <div class="sc"><div class="num n" id="sMonth">-</div><div class="lbl">This Month</div></div>
     </div>
   </div>
 
-  <!-- Filter -->
+  <!-- Log -->
   <div class="card">
-    <div class="card-header">
-      <div class="card-icon green">📊</div>
-      <div>
-        <div class="card-title">Attendance Log</div>
-        <div class="card-subtitle">Filter and view records</div>
+    <div class="card-head">
+      <div class="card-ico ico-green">📊</div>
+      <div class="card-head-text">
+        <div class="title">Attendance Log</div>
+        <div class="subtitle">Filter your records</div>
       </div>
     </div>
     <div class="filter-row">
-      <button class="filter-btn active" onclick="filterAttendance('week',this)">Weekly</button>
-      <button class="filter-btn" onclick="filterAttendance('month',this)">Monthly</button>
-      <button class="filter-btn" onclick="filterAttendance('custom',this)">Custom</button>
+      <button class="fbtn active" onclick="setFilter('week',this)">Weekly</button>
+      <button class="fbtn"        onclick="setFilter('month',this)">Monthly</button>
+      <button class="fbtn"        onclick="setFilter('custom',this)">Custom</button>
     </div>
-    <div class="custom-range" id="customRange">
-      <input type="date" id="customFrom">
-      <span style="font-weight:700;color:var(--text-light)">→</span>
-      <input type="date" id="customTo">
-      <button class="cam-btn" style="background:var(--blue-bright);color:white;padding:8px 14px;border-radius:8px;" onclick="loadAttendance()">Go</button>
+    <div class="crange" id="crange">
+      <input type="date" id="cFrom">
+      <span style="color:var(--text-soft);font-size:13px">→</span>
+      <input type="date" id="cTo">
+      <button onclick="loadAttendance()">Go</button>
     </div>
-    <div id="attTableContainer">
-      <div class="empty-state">
-        <div class="empty-icon">📭</div>
-        <p>Loading your records...</p>
-      </div>
+    <div id="attLog">
+      <div class="empty"><div class="ei">⏳</div><p>Loading records...</p></div>
     </div>
   </div>
 </div>
 
-<!-- CONFIRMATION MODAL -->
-<div class="modal-overlay" id="confirmModal">
+<!-- MODAL -->
+<div class="overlay" id="modal">
   <div class="modal">
-    <div class="modal-icon">🎉</div>
-    <div class="modal-title">Attendance Submitted!</div>
-    <div id="modalDetails"></div>
-    <button class="modal-close" onclick="closeModal()">✅ Done</button>
+    <div class="m-icon">🎉</div>
+    <div class="m-title">Attendance Submitted!</div>
+    <div id="mBody"></div>
+    <button class="m-close" onclick="closeModal()">Done ✓</button>
   </div>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
-
-<canvas id="captureCanvas" style="display:none;"></canvas>
+<canvas id="cvs" style="display:none"></canvas>
 
 <script>
-// ============================================================
-// CONFIGURATION - Update these with your deployment values
-// ============================================================
-const CONFIG = {
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzwgLsZuPCV4tnc8znZtNCmKXfHQOQVFa6iF4bGznGzUXGag2h5T0iXzq1XjlhtSOU-Kg/exec', // Replace after deploying Apps Script
+// ─── CONFIG ───────────────────────────────────────────────
+const CFG = {
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxLpPgy6S2bjTzAuWRyH4kUH9VE6oZV9LEtIQ_FMr9-JpmLRXAdRnvq2ivrceqhwJ2mwA/exec'
 };
 
-// ============================================================
-// STATE
-// ============================================================
+// ─── STATE ────────────────────────────────────────────────
 let selfieBlob = null, labourBlob = null;
 let selfieStream = null, labourStream = null;
-let selfieFacingMode = 'user', labourFacingMode = 'environment';
+let selfieFace = 'user', labourFace = 'environment';
 let currentFilter = 'week';
-let deviceFingerprint = '';
+let deviceFP = '';
 
-// ============================================================
-// INIT
-// ============================================================
+// Location state — captured EARLY on load
+let gpsLat = '', gpsLng = '', gpsAddress = '';
+let locReady = false;
+
+// ─── INIT ─────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  updateDateTime();
-  setInterval(updateDateTime, 1000);
-  deviceFingerprint = getFingerprint();
-  setDefaultCustomDates();
+  tickClock();
+  setInterval(tickClock, 1000);
+  deviceFP = fingerprint();
+  setDefaultDates();
+  captureLocationNow();   // ← grab location immediately on page load
 });
 
-function updateDateTime() {
-  const now = new Date();
-  document.getElementById('liveDate').textContent = now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-  document.getElementById('liveTime').textContent = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: true });
-  document.getElementById('fieldDate').value = now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
-  document.getElementById('fieldTime').value = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: true });
+function tickClock() {
+  const n = new Date();
+  document.getElementById('liveDate').textContent =
+    n.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  document.getElementById('liveTime').textContent =
+    n.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
+  document.getElementById('fDate').value =
+    n.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  document.getElementById('fTime').value =
+    n.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
 }
 
-function getFingerprint() {
-  const nav = window.navigator;
-  const s = [nav.userAgent, nav.language, screen.width, screen.height, screen.colorDepth, new Date().getTimezoneOffset()].join('|');
-  let hash = 0;
-  for (let i = 0; i < s.length; i++) { hash = ((hash << 5) - hash) + s.charCodeAt(i); hash |= 0; }
-  return Math.abs(hash).toString(36);
+function fingerprint() {
+  const s = [navigator.userAgent, navigator.language, screen.width, screen.height, new Date().getTimezoneOffset()].join('|');
+  let h = 0;
+  for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+  return Math.abs(h).toString(36);
 }
 
-// ============================================================
-// TABS
-// ============================================================
-function switchTab(tab) {
+// ─── LOCATION — captured on page load ─────────────────────
+function captureLocationNow() {
+  const banner = document.getElementById('locBanner');
+  const msg    = document.getElementById('locMsg');
+
+  banner.className = 'loc-banner';
+  msg.textContent  = 'Getting your location...';
+
+  if (!navigator.geolocation) {
+    banner.className = 'loc-banner err';
+    msg.textContent  = 'Geolocation not supported on this device';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      gpsLat  = pos.coords.latitude.toFixed(6);
+      gpsLng  = pos.coords.longitude.toFixed(6);
+      locReady = true;
+
+      // Show coordinates immediately, then get address
+      banner.className = 'loc-banner ok';
+      msg.textContent  = `📍 ${gpsLat}, ${gpsLng} — fetching address...`;
+
+      try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${gpsLat}&lon=${gpsLng}&format=json`);
+        const d = await r.json();
+        gpsAddress = d.display_name || `${gpsLat}, ${gpsLng}`;
+        msg.textContent = '📍 ' + gpsAddress.substring(0, 80) + (gpsAddress.length > 80 ? '…' : '');
+      } catch {
+        gpsAddress = `${gpsLat}, ${gpsLng}`;
+        msg.textContent = `📍 ${gpsLat}, ${gpsLng}`;
+      }
+    },
+    (err) => {
+      banner.className = 'loc-banner err';
+      msg.textContent  = '⚠ Location denied — will still save coordinates as blank';
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+  );
+}
+
+// ─── TABS ─────────────────────────────────────────────────
+function switchTab(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  event.currentTarget.classList.add('active');
-  if (tab === 'attendance') loadAttendance();
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'attendance') loadAttendance();
 }
 
-// ============================================================
-// TOGGLE LABOUR PHOTO
-// ============================================================
+// ─── LABOUR PHOTO TOGGLE ──────────────────────────────────
 function toggleLabourPhoto() {
-  const val = document.getElementById('numLabour').value;
-  document.getElementById('labourPhotoCard').style.display = (val && parseInt(val) > 0) ? 'block' : 'none';
+  const v = document.getElementById('numLabour').value;
+  document.getElementById('labourCard').style.display =
+    (v && parseInt(v) > 0) ? 'block' : 'none';
 }
 
-// ============================================================
-// CAMERA
-// ============================================================
-async function startCamera(type) {
-  const facing = type === 'selfie' ? selfieFacingMode : labourFacingMode;
-  const constraints = {
-    video: {
-      facingMode: facing,
-      width: type === 'selfie' ? { ideal: 720 } : { ideal: 1280 },
-      height: type === 'selfie' ? { ideal: 1280 } : { ideal: 720 },
-    }
-  };
+// ─── CAMERA ───────────────────────────────────────────────
+async function startCam(t) {
+  const face = t === 'selfie' ? selfieFace : labourFace;
+  const portrait = t === 'selfie';
   try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    if (type === 'selfie') { selfieStream = stream; document.getElementById('selfieVideo').srcObject = stream; }
-    else { labourStream = stream; document.getElementById('labourVideo').srcObject = stream; }
-    document.getElementById(type + 'Placeholder').style.display = 'none';
-    document.getElementById(type + 'PreviewArea').style.display = 'block';
-    document.getElementById(type + 'Widget').classList.add('active-cam');
-  } catch (err) {
-    showToast('Camera access denied. Please allow camera.');
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: face,
+        width:  { ideal: portrait ? 720  : 1280 },
+        height: { ideal: portrait ? 1280 : 720  }
+      }
+    });
+    if (t === 'selfie') { selfieStream = stream; document.getElementById('selfieVid').srcObject = stream; }
+    else                { labourStream = stream; document.getElementById('labourVid').srcObject = stream; }
+    document.getElementById(t+'PH').style.display      = 'none';
+    document.getElementById(t+'Preview').style.display = 'block';
+    document.getElementById(t+'Wrap').classList.add('live');
+  } catch {
+    toast('Camera access denied — please allow camera permission');
   }
 }
 
-async function switchCamera(type) {
-  if (type === 'selfie') selfieFacingMode = selfieFacingMode === 'user' ? 'environment' : 'user';
-  else labourFacingMode = labourFacingMode === 'user' ? 'environment' : 'user';
-  stopCamera(type);
-  setTimeout(() => startCamera(type), 300);
+function switchCam(t) {
+  if (t === 'selfie') selfieFace = selfieFace === 'user' ? 'environment' : 'user';
+  else                labourFace = labourFace === 'user' ? 'environment' : 'user';
+  stopCam(t);
+  setTimeout(() => startCam(t), 300);
 }
 
-function stopCamera(type) {
-  const stream = type === 'selfie' ? selfieStream : labourStream;
-  if (stream) stream.getTracks().forEach(t => t.stop());
-  if (type === 'selfie') selfieStream = null; else labourStream = null;
-  document.getElementById(type + 'PreviewArea').style.display = 'none';
-  document.getElementById(type + 'Placeholder').style.display = 'flex';
-  document.getElementById(type + 'Widget').classList.remove('active-cam');
+function stopCam(t) {
+  const s = t === 'selfie' ? selfieStream : labourStream;
+  if (s) s.getTracks().forEach(tr => tr.stop());
+  if (t === 'selfie') selfieStream = null; else labourStream = null;
+  document.getElementById(t+'Preview').style.display = 'none';
+  document.getElementById(t+'PH').style.display      = 'flex';
+  document.getElementById(t+'Wrap').classList.remove('live');
 }
 
-function capturePhoto(type) {
-  const video = document.getElementById(type + 'Video');
-  const canvas = document.getElementById('captureCanvas');
-  const isPortrait = type === 'selfie';
-  const w = isPortrait ? 720 : 1280;
-  const h = isPortrait ? 1280 : 720;
-  canvas.width = w; canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, w, h);
-
-  canvas.toBlob(blob => {
-    compressImage(blob, type === 'selfie' ? 0.7 : 0.65, w, h, (compressed) => {
-      const url = URL.createObjectURL(compressed);
-      if (type === 'selfie') selfieBlob = compressed; else labourBlob = compressed;
-      document.getElementById(type + 'PhotoImg').src = url;
-      document.getElementById(type + 'PreviewArea').style.display = 'none';
-      document.getElementById(type + 'PhotoPreview').style.display = 'block';
-      const stream = type === 'selfie' ? selfieStream : labourStream;
-      if (stream) stream.getTracks().forEach(t => t.stop());
-      showToast('Photo captured!');
+function capture(t) {
+  const vid = document.getElementById(t + 'Vid');
+  const cvs = document.getElementById('cvs');
+  const p   = t === 'selfie';
+  cvs.width = p ? 720 : 1280; cvs.height = p ? 1280 : 720;
+  cvs.getContext('2d').drawImage(vid, 0, 0, cvs.width, cvs.height);
+  cvs.toBlob(blob => {
+    compress(blob, p ? 0.72 : 0.68, cvs.width, cvs.height, comp => {
+      const url = URL.createObjectURL(comp);
+      if (t === 'selfie') selfieBlob = comp; else labourBlob = comp;
+      document.getElementById(t+'Img').src = url;
+      document.getElementById(t+'Preview').style.display = 'none';
+      document.getElementById(t+'Photo').style.display   = 'block';
+      const s = t === 'selfie' ? selfieStream : labourStream;
+      if (s) s.getTracks().forEach(tr => tr.stop());
+      toast('Photo captured!');
     });
-  }, 'image/jpeg', 0.9);
+  }, 'image/jpeg', 0.92);
 }
 
-function compressImage(blob, quality, maxW, maxH, callback) {
-  const img = new Image();
-  const url = URL.createObjectURL(blob);
+function compress(blob, q, mW, mH, cb) {
+  const img = new Image(), url = URL.createObjectURL(blob);
   img.onload = () => {
-    const canvas = document.createElement('canvas');
+    const c = document.createElement('canvas');
     let w = img.width, h = img.height;
-    if (w > maxW) { h = h * maxW / w; w = maxW; }
-    if (h > maxH) { w = w * maxH / h; h = maxH; }
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-    canvas.toBlob(callback, 'image/jpeg', quality);
+    if (w > mW) { h = h * mW / w; w = mW; }
+    if (h > mH) { w = w * mH / h; h = mH; }
+    c.width = w; c.height = h;
+    c.getContext('2d').drawImage(img, 0, 0, w, h);
+    c.toBlob(cb, 'image/jpeg', q);
     URL.revokeObjectURL(url);
   };
   img.src = url;
 }
 
-function retakePhoto(type) {
-  if (type === 'selfie') selfieBlob = null; else labourBlob = null;
-  document.getElementById(type + 'PhotoPreview').style.display = 'none';
-  document.getElementById(type + 'Placeholder').style.display = 'flex';
-  document.getElementById(type + 'Widget').classList.remove('active-cam');
+function retake(t) {
+  if (t === 'selfie') selfieBlob = null; else labourBlob = null;
+  document.getElementById(t+'Photo').style.display = 'none';
+  document.getElementById(t+'PH').style.display    = 'flex';
+  document.getElementById(t+'Wrap').classList.remove('live');
 }
 
-// ============================================================
-// GEOLOCATION
-// ============================================================
-function getLocation() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) { reject('Geolocation not supported'); return; }
-    navigator.geolocation.getCurrentPosition(
-      pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      err => reject(err.message),
-      { enableHighAccuracy: true, timeout: 15000 }
-    );
-  });
-}
-
-async function reverseGeocode(lat, lng) {
-  try {
-    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
-    const data = await res.json();
-    return data.display_name || `${lat}, ${lng}`;
-  } catch { return `${lat}, ${lng}`; }
-}
-
-// ============================================================
-// BATTERY
-// ============================================================
+// ─── BATTERY ──────────────────────────────────────────────
 async function getBattery() {
-  try {
-    const b = await navigator.getBattery();
-    return Math.round(b.level * 100) + '%';
-  } catch { return 'N/A'; }
+  try { const b = await navigator.getBattery(); return Math.round(b.level * 100) + '%'; }
+  catch { return 'N/A'; }
 }
 
-// ============================================================
-// SUBMIT
-// ============================================================
+// ─── SUBMIT ───────────────────────────────────────────────
 async function handleSubmit() {
-  const empName = document.getElementById('empName').value.trim();
-  const siteDetails = document.getElementById('siteDetails').value.trim();
-  const numLabour = document.getElementById('numLabour').value.trim();
-  const now = new Date();
+  const empName    = document.getElementById('empName').value.trim();
+  const siteDetails= document.getElementById('siteDetails').value.trim();
+  const numLabour  = document.getElementById('numLabour').value.trim();
 
-  // Validation
-  if (!empName) { showToast('⚠️ Employee Name is required'); document.getElementById('empName').focus(); return; }
-  if (!siteDetails) { showToast('⚠️ Site Details are required'); document.getElementById('siteDetails').focus(); return; }
-  if (!selfieBlob) { showToast('⚠️ Please capture your selfie'); return; }
-  if (numLabour && parseInt(numLabour) > 0 && !labourBlob) { showToast('⚠️ Please capture Labour Photo'); return; }
+  if (!empName)     { toast('⚠ Employee Name is required'); document.getElementById('empName').focus(); return; }
+  if (!siteDetails) { toast('⚠ Site Details are required'); document.getElementById('siteDetails').focus(); return; }
+  if (!selfieBlob)  { toast('⚠ Please capture your Selfie first'); return; }
+  if (numLabour && parseInt(numLabour) > 0 && !labourBlob) { toast('⚠ Please capture Labour Photo'); return; }
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div> Submitting...';
-  btn.classList.add('loading');
+  btn.innerHTML = '<div class="spin"></div> Submitting...';
 
-  // Location
-  const locStatus = document.getElementById('locationStatus');
-  locStatus.className = 'location-status';
-  locStatus.innerHTML = '<div class="loc-dot"></div><span>Getting your location...</span>';
-
-  let lat = '', lng = '', address = '';
-  try {
-    const pos = await getLocation();
-    lat = pos.lat.toFixed(6); lng = pos.lng.toFixed(6);
-    address = await reverseGeocode(lat, lng);
-    locStatus.className = 'location-status success';
-    locStatus.innerHTML = `<div class="loc-dot"></div><span>📍 ${address.substring(0,60)}...</span>`;
-  } catch (e) {
-    locStatus.className = 'location-status error';
-    locStatus.innerHTML = `<div class="loc-dot"></div><span>Location unavailable: ${e}</span>`;
+  // If location wasn't ready yet, try one more quick attempt
+  if (!locReady) {
+    try {
+      await new Promise((res, rej) => {
+        navigator.geolocation.getCurrentPosition(pos => {
+          gpsLat = pos.coords.latitude.toFixed(6);
+          gpsLng = pos.coords.longitude.toFixed(6);
+          locReady = true;
+          res();
+        }, rej, { timeout: 8000 });
+      });
+    } catch { /* use blank */ }
   }
 
-  const battery = await getBattery();
-  const dateStr = now.toLocaleDateString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric' }).replace(/\//g, '-');
-  const timeStr = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: false }).replace(/:/g, '-');
-  const selfieFileName = `${empName.replace(/\s+/g,'_')}_${dateStr}_${timeStr}`;
-  const labourFileName = `${siteDetails.replace(/[^a-zA-Z0-9]/g,'_').substring(0,20)}_${dateStr}_${timeStr}`;
+  const now      = new Date();
+  const battery  = await getBattery();
+  const dateStr  = now.toLocaleDateString('en-IN', { day:'2-digit', month:'2-digit', year:'numeric' }).replace(/\//g,'-');
+  const timeStr  = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false }).replace(/:/g,'-');
+  const selfieFN = `${empName.replace(/\s+/g,'_')}_${dateStr}_${timeStr}`;
+  const labourFN = `${siteDetails.replace(/[^a-zA-Z0-9]/g,'_').substring(0,20)}_${dateStr}_${timeStr}`;
 
-  // Convert blobs to base64
-  const selfieBase64 = await blobToBase64(selfieBlob);
-  const labourBase64 = labourBlob ? await blobToBase64(labourBlob) : '';
+  const selfieB64 = await toB64(selfieBlob);
+  const labourB64 = labourBlob ? await toB64(labourBlob) : '';
 
   const payload = {
     action: 'checkIn',
-    date: now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }),
-    time: now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12: true }),
+    date: document.getElementById('fDate').value,
+    time: document.getElementById('fTime').value,
     empName, siteDetails, numLabour: numLabour || '0',
-    lat, lng, address, battery,
-    deviceFingerprint,
-    selfieFileName, labourFileName,
-    selfieBase64, labourBase64
+    lat: gpsLat, lng: gpsLng, address: gpsAddress,
+    battery, deviceFingerprint: deviceFP,
+    selfieFileName: selfieFN, labourFileName: labourFN,
+    selfieBase64: selfieB64, labourBase64: labourB64
   };
 
   try {
-    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json();
-
-    if (result.success) {
-      showConfirmation({ date: payload.date, time: payload.time, empName, siteDetails, numLabour: numLabour || '0' });
-      resetForm();
-    } else {
-      showToast('❌ Submission failed: ' + (result.message || 'Unknown error'));
-    }
+    if (CFG.SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') throw new Error('demo');
+    const res  = await fetch(CFG.SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
   } catch (err) {
-    // For demo/testing when no backend is connected
-    if (CONFIG.APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
-      showConfirmation({ date: payload.date, time: payload.time, empName, siteDetails, numLabour: numLabour || '0' });
-      resetForm();
-    } else {
-      showToast('❌ Network error. Check connection.');
+    if (err.message !== 'demo') {
+      toast('❌ Submission failed: ' + err.message);
+      btn.disabled = false;
+      btn.innerHTML = '🚀 Submit Attendance';
+      return;
     }
+    // demo mode — fall through
   }
 
+  showModal({ date: payload.date, time: payload.time, empName, siteDetails, numLabour: numLabour || '0' });
+  resetForm();
   btn.disabled = false;
-  btn.innerHTML = '<span>🚀</span> Submit Attendance';
-  btn.classList.remove('loading');
+  btn.innerHTML = '🚀 Submit Attendance';
 }
 
-function blobToBase64(blob) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result.split(',')[1]);
-    reader.readAsDataURL(blob);
+function toB64(blob) {
+  return new Promise(res => {
+    const r = new FileReader();
+    r.onloadend = () => res(r.result.split(',')[1]);
+    r.readAsDataURL(blob);
   });
 }
 
 function resetForm() {
-  document.getElementById('empName').value = '';
-  document.getElementById('siteDetails').value = '';
-  document.getElementById('numLabour').value = '';
+  ['empName','siteDetails','numLabour'].forEach(id => document.getElementById(id).value = '');
   selfieBlob = null; labourBlob = null;
-  retakePhoto('selfie'); retakePhoto('labour');
-  document.getElementById('labourPhotoCard').style.display = 'none';
+  retake('selfie'); retake('labour');
+  document.getElementById('labourCard').style.display = 'none';
 }
 
-// ============================================================
-// MODAL
-// ============================================================
-function showConfirmation(data) {
-  const details = [
-    { label: 'Date', value: data.date },
-    { label: 'Time', value: data.time },
-    { label: 'Employee', value: data.empName },
-    { label: 'Site', value: data.siteDetails },
-    { label: 'No. of Labour', value: data.numLabour || '0' },
+// ─── MODAL ────────────────────────────────────────────────
+function showModal(d) {
+  const rows = [
+    ['Date', d.date], ['Time', d.time],
+    ['Employee', d.empName], ['Site', d.siteDetails], ['No. of Labour', d.numLabour]
   ];
-  document.getElementById('modalDetails').innerHTML = details.map(d =>
-    `<div class="modal-detail"><span class="label">${d.label}</span><span class="value">${d.value}</span></div>`
+  document.getElementById('mBody').innerHTML = rows.map(([l,v]) =>
+    `<div class="m-row"><span class="lbl">${l}</span><span class="val">${v}</span></div>`
   ).join('');
-  document.getElementById('confirmModal').classList.add('show');
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+// ─── ATTENDANCE ───────────────────────────────────────────
+function setDefaultDates() {
+  const t = new Date(), f = new Date(t);
+  f.setDate(f.getDate() - 30);
+  document.getElementById('cTo').value   = t.toISOString().split('T')[0];
+  document.getElementById('cFrom').value = f.toISOString().split('T')[0];
 }
 
-function closeModal() { document.getElementById('confirmModal').classList.remove('show'); }
-
-// ============================================================
-// ATTENDANCE VIEW
-// ============================================================
-function setDefaultCustomDates() {
-  const today = new Date();
-  const from = new Date(today); from.setDate(from.getDate() - 30);
-  document.getElementById('customTo').value = today.toISOString().split('T')[0];
-  document.getElementById('customFrom').value = from.toISOString().split('T')[0];
-}
-
-function filterAttendance(type, btn) {
+function setFilter(type, btn) {
   currentFilter = type;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('customRange').className = 'custom-range' + (type === 'custom' ? ' show' : '');
+  document.getElementById('crange').className = 'crange' + (type === 'custom' ? ' show' : '');
   if (type !== 'custom') loadAttendance();
 }
 
 async function loadAttendance() {
-  const container = document.getElementById('attTableContainer');
-  container.innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><p>Loading records...</p></div>';
+  const log = document.getElementById('attLog');
+  log.innerHTML = '<div class="empty"><div class="ei">⏳</div><p>Loading...</p></div>';
 
-  if (CONFIG.APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚙️</div><p>Connect Apps Script to view records</p></div>';
-    document.getElementById('scoreToday').textContent = '0';
-    document.getElementById('scoreWeek').textContent = '0';
-    document.getElementById('scoreMonth').textContent = '0';
+  if (CFG.SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') {
+    ['sToday','sWeek','sMonth'].forEach(id => document.getElementById(id).textContent = '0');
+    log.innerHTML = '<div class="empty"><div class="ei">⚙️</div><p>Connect Apps Script to view records</p></div>';
     return;
   }
 
   const today = new Date();
-  let fromDate, toDate = today.toISOString().split('T')[0];
-
-  if (currentFilter === 'week') { const f = new Date(today); f.setDate(f.getDate() - 7); fromDate = f.toISOString().split('T')[0]; }
-  else if (currentFilter === 'month') { const f = new Date(today); f.setMonth(f.getMonth() - 1); fromDate = f.toISOString().split('T')[0]; }
-  else { fromDate = document.getElementById('customFrom').value; toDate = document.getElementById('customTo').value; }
+  let from, to = today.toISOString().split('T')[0];
+  if (currentFilter === 'week')  { const f=new Date(today); f.setDate(f.getDate()-7);   from=f.toISOString().split('T')[0]; }
+  if (currentFilter === 'month') { const f=new Date(today); f.setMonth(f.getMonth()-1); from=f.toISOString().split('T')[0]; }
+  if (currentFilter === 'custom') { from = document.getElementById('cFrom').value; to = document.getElementById('cTo').value; }
 
   try {
-    const url = `${CONFIG.APPS_SCRIPT_URL}?action=getAttendance&fingerprint=${deviceFingerprint}&from=${fromDate}&to=${toDate}`;
-    const res = await fetch(url);
+    const res  = await fetch(`${CFG.SCRIPT_URL}?action=getAttendance&fingerprint=${deviceFP}&from=${from}&to=${to}`);
     const data = await res.json();
-    renderAttendance(data.records || [], data.scores || {});
+    renderLog(data.records || [], data.scores || {});
   } catch {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">❌</div><p>Failed to load records</p></div>';
+    log.innerHTML = '<div class="empty"><div class="ei">❌</div><p>Failed to load. Check connection.</p></div>';
   }
 }
 
-function renderAttendance(records, scores) {
-  document.getElementById('scoreToday').textContent = scores.today || 0;
-  document.getElementById('scoreWeek').textContent = scores.week || 0;
-  document.getElementById('scoreMonth').textContent = scores.month || 0;
+// ─── DATE / TIME FORMATTERS ───────────────────────────────
+function fmtDate(raw) {
+  if (!raw) return '-';
+  const s = String(raw).trim();
+  if (/^\d{1,2}[\s\-][A-Za-z]{3}[\s\-]\d{4}$/.test(s)) return s.replace(/-/g,' ');
+  if (s.includes('T') || /^\d{4}-\d{2}-\d{2}/.test(s)) {
+    const d = new Date(s);
+    if (!isNaN(d)) return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  }
+  const n = parseFloat(s);
+  if (!isNaN(n) && n > 1000 && n < 60000) {
+    const d = new Date(new Date(1899,11,30).getTime() + n*86400000);
+    return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  }
+  return s;
+}
 
+function fmtTime(raw) {
+  if (!raw) return '-';
+  const s = String(raw).trim();
+  if (/^\d{1,2}:\d{2}/.test(s)) return s.replace(/\s*(am|pm)$/i, m => ' '+m.trim().toUpperCase());
+  if (s.includes('T')) {
+    const d = new Date(s);
+    if (!isNaN(d)) return d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+  }
+  const n = parseFloat(s);
+  if (!isNaN(n) && n >= 0 && n < 1) {
+    const ts = Math.round(n*86400), hh=Math.floor(ts/3600), mm=Math.floor((ts%3600)/60);
+    return `${String(hh%12||12).padStart(2,'0')}:${String(mm).padStart(2,'0')} ${hh>=12?'PM':'AM'}`;
+  }
+  if (!isNaN(n) && n > 1) {
+    const d = new Date(new Date(1899,11,30).getTime() + n*86400000);
+    if (!isNaN(d)) return d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+  }
+  return s;
+}
+
+function renderLog(records, scores) {
+  document.getElementById('sToday').textContent = scores.today || 0;
+  document.getElementById('sWeek').textContent  = scores.week  || 0;
+  document.getElementById('sMonth').textContent = scores.month || 0;
+
+  const log = document.getElementById('attLog');
   if (!records.length) {
-    document.getElementById('attTableContainer').innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>No records found for this period</p></div>';
+    log.innerHTML = '<div class="empty"><div class="ei">📭</div><p>No records found for this period</p></div>';
     return;
   }
-
   const rows = records.map(r => `
     <tr>
-      <td>${r.date}</td>
-      <td>${r.time || '-'}</td>
+      <td>${fmtDate(r.date)}</td>
+      <td>${fmtTime(r.time)}</td>
       <td>${r.site || '-'}</td>
-      <td><span class="badge badge-present">Present</span></td>
-      <td>${r.labour || '0'}</td>
-    </tr>
-  `).join('');
+      <td><span class="badge bp">Present</span></td>
+      <td style="text-align:center">${r.labour || '0'}</td>
+    </tr>`).join('');
 
-  document.getElementById('attTableContainer').innerHTML = `
-    <div class="att-table-wrap">
+  log.innerHTML = `
+    <div class="tbl-wrap">
       <table>
         <thead><tr><th>Date</th><th>Time</th><th>Site</th><th>Status</th><th>Labour</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
-    </div>
-  `;
+    </div>`;
 }
 
-// ============================================================
-// TOAST
-// ============================================================
-function showToast(msg) {
+// ─── TOAST ────────────────────────────────────────────────
+function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 </script>
 </body>

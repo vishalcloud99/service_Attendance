@@ -329,11 +329,21 @@
   .toast {
     position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%);
     background: var(--blue-dark); color: #fff;
-    padding: 9px 18px; border-radius: 50px;
+    padding: 10px 18px; border-radius: 12px;
     font-size: 13px; font-weight: 500; z-index: 300;
-    opacity: 0; transition: opacity .25s; pointer-events: none; white-space: nowrap;
+    opacity: 0; transition: opacity .25s; pointer-events: none;
+    white-space: normal; max-width: 88vw; text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,.25);
   }
   .toast.show { opacity: 1; }
+
+  /* ── ERROR MODAL ── */
+  .err-modal { background: var(--white); border-radius: 16px; padding: 24px 20px; max-width: 360px; width: 100%; box-shadow: 0 16px 48px rgba(0,0,0,.2); animation: pop .28s cubic-bezier(.34,1.56,.64,1); }
+  .err-icon  { font-size: 44px; text-align: center; }
+  .err-title { font-size: 16px; font-weight: 700; text-align: center; color: #991b1b; margin: 8px 0 10px; }
+  .err-body  { font-size: 13px; color: var(--text-mid); text-align: center; line-height: 1.5; word-break: break-word; margin-bottom: 12px; }
+  .err-hint  { font-size: 12px; color: var(--text-soft); background: var(--bg); border-radius: 8px; padding: 10px 12px; margin-bottom: 16px; line-height: 1.6; }
+  .err-close { width:100%; padding:11px; background:var(--blue); color:#fff; border:none; border-radius:8px; font-family:var(--font); font-size:14px; font-weight:600; cursor:pointer; }
 
   /* ── SPINNER ── */
   .spin {
@@ -541,6 +551,17 @@
   </div>
 </div>
 
+<!-- ERROR MODAL -->
+<div class="overlay" id="errModal">
+  <div class="err-modal">
+    <div class="err-icon">⚠️</div>
+    <div class="err-title">Submission Failed</div>
+    <div class="err-body" id="errBody"></div>
+    <div class="err-hint" id="errHint"></div>
+    <button class="err-close" onclick="closeErrModal()">OK, Try Again</button>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 <canvas id="cvs" style="display:none"></canvas>
@@ -548,7 +569,7 @@
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
 const CFG = {
-  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzPlYGAIvMhjaQvUFKxC9yG_1DLEVHLsD3lGKYjNfP4k6Vtrn1GgjfwsbpLzi4eYw03dg/exec'
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzCmGegrnwyjPoerObd8NiNLadlVeFyEBDgZtRP3ChcHn9KN2HNAv8WbfNbYeNqRagD/exec'
 };
 
 // ─── STATE ────────────────────────────────────────────────
@@ -786,12 +807,17 @@ async function handleSubmit() {
 
   try {
     if (CFG.SCRIPT_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL') throw new Error('demo');
-    const res  = await fetch(CFG.SCRIPT_URL, { method:'POST', body: JSON.stringify(payload) });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.message);
+
+    // Google Apps Script CORS fix:
+    // Apps Script blocks direct fetch POST from external origins.
+    // Solution: send data as GET parameter to doGet(), which Apps Script allows cross-origin.
+    // Images are sent as separate no-cors POST (fire-and-forget, Apps Script queues them).
+    const result = await scriptGET(payload);
+    if (!result.success) throw new Error(result.message || 'Server error');
+
   } catch (err) {
     if (err.message !== 'demo') {
-      toast('❌ Submission failed: ' + err.message);
+      showErrModal(err.message);
       btn.disabled = false;
       btn.innerHTML = '🚀 Submit Attendance';
       return;
@@ -803,6 +829,62 @@ async function handleSubmit() {
   resetForm();
   btn.disabled = false;
   btn.innerHTML = '🚀 Submit Attendance';
+}
+
+// ─── APPS SCRIPT COMMUNICATION ───────────────────────────
+// Google Apps Script blocks cross-origin POST requests from
+// external pages (CORS issue). The fix:
+//   Step 1 → Send text fields via GET (?payload=...) — Apps Script allows this
+//   Step 2 → Send images via no-cors POST (fire-and-forget) — no response needed
+async function scriptGET(payload) {
+  // Separate images from text data (images are too large for GET URL)
+  const textOnly = { ...payload };
+  const selfieB64 = textOnly.selfieBase64 || '';
+  const labourB64 = textOnly.labourBase64 || '';
+  delete textOnly.selfieBase64;
+  delete textOnly.labourBase64;
+
+  // STEP 1: Send text data via GET — this works cross-origin
+  let result;
+  try {
+    const encoded = encodeURIComponent(JSON.stringify(textOnly));
+    const url     = CFG.SCRIPT_URL + '?payload=' + encoded;
+    const res     = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    result = await res.json();
+  } catch (err) {
+    throw new Error(
+      'Cannot reach Apps Script. ' +
+      'Checklist: (1) Script URL is correct ' +
+      '(2) Deployed as Web App via Deploy → New Deployment ' +
+      '(3) "Who has access" = Anyone (not "Anyone with Google account") ' +
+      '(4) You clicked Deploy not just Save. ' +
+      'Technical detail: ' + err.message
+    );
+  }
+
+  if (!result.success) return result;
+
+  // STEP 2: Send images via no-cors POST (fire-and-forget)
+  // Browser can't read the response but Apps Script saves them to Drive
+  if (selfieB64 || labourB64) {
+    const imgData = {
+      action:         'saveImages',
+      submissionId:   result.submissionId || '',
+      selfieFileName: payload.selfieFileName,
+      labourFileName: payload.labourFileName,
+      selfieBase64:   selfieB64,
+      labourBase64:   labourB64,
+    };
+    fetch(CFG.SCRIPT_URL, {
+      method:  'POST',
+      mode:    'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body:    JSON.stringify(imgData)
+    }).catch(() => {});
+  }
+
+  return result;
 }
 
 function toB64(blob) {
@@ -866,7 +948,7 @@ async function loadAttendance() {
   if (currentFilter === 'custom') { from = document.getElementById('cFrom').value; to = document.getElementById('cTo').value; }
 
   try {
-    const res  = await fetch(`${CFG.SCRIPT_URL}?action=getAttendance&fingerprint=${deviceFP}&from=${from}&to=${to}`);
+    const res  = await fetch(`${CFG.SCRIPT_URL}?action=getAttendance&fingerprint=${deviceFP}&from=${from}&to=${to}`, { cache: 'no-store' });
     const data = await res.json();
     renderLog(data.records || [], data.scores || {});
   } catch {
@@ -938,6 +1020,30 @@ function renderLog(records, scores) {
       </table>
     </div>`;
 }
+
+// ─── ERROR MODAL ─────────────────────────────────────────
+function showErrModal(msg) {
+  const m = msg || 'An unexpected error occurred.';
+
+  // Pick a helpful hint based on the error message content
+  let hint = 'Make sure your Apps Script is deployed as a Web App with "Who has access" set to <strong>Anyone</strong>, then copy the new URL into field-attendance.html.';
+
+  if (m.includes('SHEET_ID'))         hint = 'Open <strong>Code.gs</strong> in Apps Script and set the correct <code>SHEET_ID</code> value, then do a New Deployment.';
+  else if (m.includes('FOLDER'))      hint = 'Open <strong>Code.gs</strong> in Apps Script and set the correct <code>SELFIE_FOLDER_ID</code> / <code>LABOUR_FOLDER_ID</code>, then redeploy.';
+  else if (m.includes('HTTP 4'))      hint = 'The Apps Script URL is invalid or the deployment was deleted. Create a <strong>New Deployment</strong> in Apps Script and paste the new URL.';
+  else if (m.includes('Cannot reach') || m.includes('Checklist'))
+    hint = m.replace(/\n/g,'<br>').replace(/[0-9]+\./g, s => '<br>' + s); // Format checklist
+  else if (m.includes('permission'))  hint = 'Open Apps Script → Run <code>validateConfig()</code> manually → <strong>Grant all permissions</strong> when prompted.';
+  else if (m.includes('JSON') || m.includes('invalid response'))
+    hint = 'Apps Script returned an unexpected response. Confirm it is deployed as a Web App (not just saved) and access is <strong>Anyone</strong>.';
+
+  // Show first line of error as main message, rest as detail
+  const lines = m.split('\n');
+  document.getElementById('errBody').textContent = lines[0];
+  document.getElementById('errHint').innerHTML   = '💡 ' + hint;
+  document.getElementById('errModal').classList.add('show');
+}
+function closeErrModal() { document.getElementById('errModal').classList.remove('show'); }
 
 // ─── TOAST ────────────────────────────────────────────────
 function toast(msg) {

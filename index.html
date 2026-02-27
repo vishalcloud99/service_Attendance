@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Field Attendance System</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-dark: #0A2342;
+    --blue-mid: #1565C0;
+    --blue-light: #1E88E5;
+    --blue-pale: #E3F2FD;
+    --green-dark: #1B5E20;
+    --green-mid: #2E7D32;
+    --green-bright: #43A047;
+    --green-accent: #66BB6A;
+    --green-pale: #E8F5E9;
+    --white: #FFFFFF;
+    --gray-100: #F5F7FA;
+    --gray-300: #CFD8DC;
+    --gray-500: #78909C;
+    --gray-700: #455A64;
+    --shadow-sm: 0 2px 8px rgba(10,35,66,0.08);
+    --shadow-md: 0 4px 20px rgba(10,35,66,0.14);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #0A2342 0%, #1565C0 40%, #2E7D32 100%);
+    min-height: 100vh;
+    color: var(--blue-dark);
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(30,136,229,0.3) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(67,160,71,0.25) 0%, transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .app-wrapper {
+    position: relative; z-index: 1;
+    max-width: 520px; margin: 0 auto;
+    min-height: 100vh; padding: 0 0 60px 0;
+  }
+
+  /* ---- FIRST TIME SETUP MODAL ---- */
+  .setup-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, rgba(10,35,66,0.97), rgba(21,101,192,0.97));
+    z-index: 9999;
+    align-items: center; justify-content: center;
+    padding: 24px;
+    backdrop-filter: blur(8px);
+  }
+  .setup-overlay.open { display: flex; }
+  .setup-box {
+    background: white;
+    border-radius: 24px;
+    padding: 32px 28px;
+    width: 100%; max-width: 400px;
+    box-shadow: 0 20px 60px rgba(10,35,66,0.5);
+    animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.85) translateY(30px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .setup-logo {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--blue-mid), var(--green-bright));
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 0 auto 18px;
+    box-shadow: 0 4px 20px rgba(21,101,192,0.35);
+  }
+  .setup-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--blue-dark); text-align: center;
+    margin-bottom: 4px;
+  }
+  .setup-subtitle {
+    font-size: 13px; color: var(--gray-500);
+    text-align: center; margin-bottom: 24px; line-height: 1.5;
+  }
+  .setup-field { margin-bottom: 16px; }
+  .setup-label {
+    display: block;
+    font-size: 11px; font-weight: 700;
+    color: var(--gray-700);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+  .setup-label .req { color: #E53935; }
+  .setup-input {
+    width: 100%; padding: 13px 14px;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 600;
+    color: var(--blue-dark); outline: none;
+    transition: all 0.2s;
+  }
+  .setup-input:focus {
+    border-color: var(--blue-light);
+    box-shadow: 0 0 0 3px rgba(30,136,229,0.15);
+  }
+  .setup-input.phone { letter-spacing: 1px; }
+  .setup-note {
+    font-size: 11px; color: var(--gray-500);
+    margin-top: 5px; line-height: 1.4;
+  }
+  .setup-note strong { color: var(--green-dark); }
+  .setup-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--blue-mid), var(--green-bright));
+    color: white; border: none; border-radius: 12px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; margin-top: 8px;
+    box-shadow: 0 4px 16px rgba(21,101,192,0.35);
+    transition: all 0.2s;
+  }
+  .setup-btn:active { transform: scale(0.98); }
+
+  /* ---- HEADER ---- */
+  .app-header {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .app-logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--green-accent), var(--blue-light));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; box-shadow: 0 2px 10px rgba(67,160,71,0.4);
+  }
+  .logo-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px; font-weight: 700; color: white; line-height: 1.1;
+  }
+  .logo-text span { color: var(--green-accent); }
+
+  /* User pill in header */
+  .user-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px; padding: 6px 12px 6px 8px;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .user-pill:hover { background: rgba(255,255,255,0.2); }
+  .user-avatar {
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, var(--green-accent), var(--blue-light));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+  .user-info { text-align: right; }
+  .user-name { font-size: 12px; font-weight: 700; color: white; line-height: 1.1; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-phone { font-size: 10px; color: rgba(255,255,255,0.65); }
+
+  /* ---- TABS ---- */
+  .tab-bar {
+    display: flex;
+    background: rgba(10,35,66,0.4);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 0 20px;
+  }
+  .tab-btn {
+    flex: 1; padding: 13px 8px;
+    background: none; border: none;
+    color: rgba(255,255,255,0.55);
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    border-bottom: 3px solid transparent; transition: all 0.25s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .tab-btn.active { color: var(--green-accent); border-bottom-color: var(--green-accent); }
+  .tab-icon { font-size: 16px; }
+
+  /* ---- CONTENT ---- */
+  .tab-content { display: none; padding: 20px; animation: fadeUp 0.3s ease; }
+  .tab-content.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- CARDS ---- */
+  .card {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius); padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(255,255,255,0.8);
+  }
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px; padding-bottom: 12px;
+    border-bottom: 2px solid var(--blue-pale);
+  }
+  .card-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .card-icon.blue { background: var(--blue-pale); }
+  .card-icon.green { background: var(--green-pale); }
+  .card-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px; font-weight: 700;
+    color: var(--blue-dark); letter-spacing: 0.5px;
+    flex: 1;
+  }
+
+  /* Edit profile link */
+  .edit-profile-link {
+    font-size: 11px; font-weight: 700;
+    color: var(--blue-mid); cursor: pointer;
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+
+  /* Auto-row */
+  .auto-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--blue-pale);
+    border-radius: var(--radius-sm); margin-bottom: 8px;
+  }
+  .auto-label { font-size: 11px; font-weight: 700; color: var(--blue-mid); text-transform: uppercase; letter-spacing: 0.5px; }
+  .auto-value { font-size: 13px; font-weight: 600; color: var(--blue-dark); max-width: 220px; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Profile display rows */
+  .profile-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm); margin-bottom: 8px;
+  }
+  .profile-row.name-row { background: var(--green-pale); }
+  .profile-row.phone-row { background: var(--blue-pale); }
+  .profile-key { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .name-row .profile-key { color: var(--green-dark); }
+  .phone-row .profile-key { color: var(--blue-mid); }
+  .profile-val { font-size: 14px; font-weight: 700; color: var(--blue-dark); }
+  .verified-badge {
+    font-size: 10px; font-weight: 700;
+    background: var(--green-mid); color: white;
+    padding: 2px 8px; border-radius: 50px;
+    margin-left: 6px;
+  }
+
+  /* Form */
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    display: block; font-size: 12px; font-weight: 700;
+    color: var(--gray-700); text-transform: uppercase; letter-spacing: 0.6px;
+    margin-bottom: 6px;
+  }
+  .form-label .req { color: #E53935; margin-left: 2px; }
+  .form-input {
+    width: 100%; padding: 12px 14px;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 600;
+    color: var(--blue-dark); background: var(--white);
+    transition: all 0.2s; outline: none;
+  }
+  .form-input:focus { border-color: var(--blue-light); box-shadow: 0 0 0 3px rgba(30,136,229,0.15); }
+  .form-hint { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+
+  /* Location */
+  .location-display {
+    padding: 12px 14px;
+    background: var(--green-pale);
+    border: 2px solid var(--green-accent);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .location-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .location-text { font-size: 13px; font-weight: 600; color: var(--green-dark); line-height: 1.4; }
+  .location-coords { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+
+  /* Camera */
+  .camera-section {
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--radius-sm);
+    overflow: hidden; position: relative; background: #000;
+  }
+  .camera-section.portrait { aspect-ratio: 9/16; }
+  .camera-section.landscape { aspect-ratio: 16/9; }
+  .camera-placeholder {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    min-height: 200px; gap: 10px; cursor: pointer;
+  }
+  .camera-placeholder .cam-ico { font-size: 40px; opacity: 0.6; }
+  .camera-placeholder .cam-txt { color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 600; }
+  video.camera-feed { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .camera-controls { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
+  .cam-btn {
+    padding: 10px 20px; border: none; border-radius: 50px;
+    font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s; box-shadow: var(--shadow-sm);
+  }
+  .cam-btn:active { transform: scale(0.96); }
+  .cam-btn.primary { background: var(--blue-mid); color: white; }
+  .cam-btn.green { background: var(--green-bright); color: white; }
+  .cam-btn.outline { background: white; color: var(--blue-mid); border: 2px solid var(--blue-mid); }
+  .cam-btn.switch-btn {
+    background: rgba(255,255,255,0.15); color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    position: absolute; top: 10px; right: 10px;
+    padding: 8px 12px; font-size: 12px; backdrop-filter: blur(8px);
+  }
+  .photo-status {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: var(--radius-sm);
+    font-size: 12px; font-weight: 700; margin-top: 8px;
+  }
+  .photo-status.captured { background: var(--green-pale); color: var(--green-dark); }
+  .photo-status.pending { background: #FFF3E0; color: #E65100; }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, var(--blue-mid), var(--green-bright));
+    color: white; border: none; border-radius: var(--radius);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: 0 4px 20px rgba(21,101,192,0.35); transition: all 0.25s;
+    position: relative; overflow: hidden; margin-top: 8px;
+  }
+  .submit-btn::before {
+    content: ''; position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.4s;
+  }
+  .submit-btn:hover::before { left: 100%; }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .spinner {
+    width: 20px; height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: white; border-radius: 50%;
+    animation: spin 0.8s linear infinite; display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,35,66,0.75); backdrop-filter: blur(6px);
+    z-index: 998; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-box {
+    background: white; border-radius: 20px; padding: 28px;
+    width: 100%; max-width: 400px;
+    box-shadow: 0 20px 60px rgba(10,35,66,0.4);
+    animation: popIn 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+    text-align: center;
+  }
+  .modal-success-icon {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--green-bright), var(--blue-light));
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 30px; margin: 0 auto 16px;
+    box-shadow: 0 4px 20px rgba(67,160,71,0.4);
+    animation: bounceIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) 0.1s both;
+  }
+  @keyframes bounceIn { from { transform: scale(0); } to { transform: scale(1); } }
+  .modal-title { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; color: var(--green-dark); margin-bottom: 16px; }
+  .modal-detail-row {
+    display: flex; justify-content: space-between;
+    padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; font-size: 13px;
+  }
+  .modal-detail-row:nth-child(odd) { background: var(--gray-100); }
+  .modal-detail-key { font-weight: 700; color: var(--gray-700); }
+  .modal-detail-val { font-weight: 600; color: var(--blue-dark); max-width: 180px; text-align: right; }
+  .modal-close-btn {
+    margin-top: 16px; width: 100%; padding: 12px;
+    background: linear-gradient(135deg, var(--blue-mid), var(--green-bright));
+    color: white; border: none; border-radius: 12px;
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .modal-close-btn:hover { opacity: 0.9; }
+
+  /* Attendance scorecard */
+  .scorecard-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+  .score-card {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
+    border-radius: var(--radius-sm); padding: 14px 10px;
+    text-align: center; color: white; position: relative; overflow: hidden;
+  }
+  .score-card::after {
+    content: ''; position: absolute; top: -10px; right: -10px;
+    width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.08);
+  }
+  .score-card.green { background: linear-gradient(135deg, var(--green-dark), var(--green-mid)); }
+  .score-number { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 700; line-height: 1; }
+  .score-label { font-size: 10px; font-weight: 700; opacity: 0.8; text-transform: uppercase; margin-top: 3px; }
+
+  /* Who am I banner in attendance tab */
+  .identity-banner {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
+    border-radius: var(--radius-sm); padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .identity-avatar {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .identity-text .iname { font-size: 15px; font-weight: 700; color: white; }
+  .identity-text .iphone { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 1px; }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 7px 14px; border: 2px solid var(--blue-pale);
+    border-radius: 50px; background: white; color: var(--blue-mid);
+    font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .filter-btn.active { background: var(--blue-mid); color: white; border-color: var(--blue-mid); }
+  .date-range-row { display: none; gap: 8px; margin-bottom: 14px; }
+  .date-range-row.show { display: flex; }
+  .date-range-row input {
+    flex: 1; padding: 8px 10px; border: 2px solid var(--gray-300);
+    border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 12px; outline: none;
+  }
+  .date-range-row input:focus { border-color: var(--blue-light); }
+  .apply-filter-btn {
+    padding: 8px 14px; background: var(--blue-mid); color: white;
+    border: none; border-radius: 8px;
+    font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+
+  .attendance-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .attendance-table th {
+    background: var(--blue-dark); color: white;
+    padding: 10px 8px; text-align: left; font-weight: 700;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .attendance-table th:first-child { border-radius: 8px 0 0 0; }
+  .attendance-table th:last-child { border-radius: 0 8px 0 0; }
+  .attendance-table td { padding: 9px 8px; border-bottom: 1px solid var(--gray-100); font-weight: 600; color: var(--blue-dark); }
+  .attendance-table tr:hover td { background: var(--blue-pale); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 50px; font-size: 11px; font-weight: 700; }
+  .badge.present { background: var(--green-pale); color: var(--green-dark); }
+
+  .empty-state { text-align: center; padding: 30px 20px; color: var(--gray-500); }
+  .empty-state .empty-ico { font-size: 40px; margin-bottom: 10px; }
+  .empty-state .empty-txt { font-size: 14px; font-weight: 600; }
+
+  .loading-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,35,66,0.8); backdrop-filter: blur(4px);
+    z-index: 997; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-spinner-big {
+    width: 50px; height: 50px;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top-color: var(--green-accent);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+  }
+  .loading-text { color: white; font-weight: 700; font-size: 15px; }
+
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: var(--blue-dark); color: white;
+    padding: 10px 20px; border-radius: 50px;
+    font-size: 13px; font-weight: 600; z-index: 9999;
+    opacity: 0; transition: opacity 0.3s; white-space: nowrap; box-shadow: var(--shadow-md);
+  }
+  .toast.show { opacity: 1; }
+
+  /* Live clock in header */
+  .header-clock { color: rgba(255,255,255,0.7); font-size: 11px; font-weight: 700; text-align: right; }
+  .header-clock .clock-time { font-size: 15px; color: white; font-family: 'Rajdhani', sans-serif; }
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+
+  <!-- ===== HEADER ===== -->
+  <div class="app-header">
+    <div class="app-logo">
+      <div class="logo-icon">📍</div>
+      <div class="logo-text">Field<span>Track</span></div>
+    </div>
+    <div id="header-right" style="display:flex;align-items:center;gap:10px;">
+      <div class="header-clock">
+        <div class="clock-time" id="live-time"></div>
+        <div id="live-date"></div>
+      </div>
+      <div class="user-pill" onclick="openEditProfile()" id="user-pill" style="display:none;">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="user-pill-name">—</div>
+          <div class="user-phone" id="user-pill-phone">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TABS ===== -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('checkin', this)">
+      <span class="tab-icon">✅</span> Check-In
+    </button>
+    <button class="tab-btn" onclick="switchTab('attendance', this)">
+      <span class="tab-icon">📋</span> My Attendance
+    </button>
+  </div>
+
+  <!-- ===== CHECK-IN TAB ===== -->
+  <div id="tab-checkin" class="tab-content active">
+
+    <!-- Date/Time -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">🕐</div>
+        <div class="card-title">AUTO-CAPTURED INFO</div>
+      </div>
+      <div class="auto-row">
+        <span class="auto-label">📅 Date</span>
+        <span class="auto-value" id="disp-date">—</span>
+      </div>
+      <div class="auto-row">
+        <span class="auto-label">⏱ Time</span>
+        <span class="auto-value" id="disp-time">—</span>
+      </div>
+    </div>
+
+    <!-- Employee Details -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">👤</div>
+        <div class="card-title">EMPLOYEE DETAILS</div>
+        <span class="edit-profile-link" onclick="openEditProfile()">✏️ Edit Profile</span>
+      </div>
+
+      <!-- Profile display (shown when profile exists) -->
+      <div id="profile-display" style="display:none; margin-bottom:14px;">
+        <div class="profile-row name-row">
+          <span class="profile-key">👤 Name</span>
+          <span class="profile-val" id="profile-name-disp">—</span>
+        </div>
+        <div class="profile-row phone-row">
+          <span class="profile-key">📱 Mobile</span>
+          <span class="profile-val" id="profile-phone-disp">—<span class="verified-badge">✓ ID</span></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Site Details <span class="req">*</span></label>
+        <input class="form-input" type="text" id="site-details" placeholder="e.g. AMPIN:ICR/MCR/SWITCHYARD/WTG" autocomplete="off">
+        <div class="form-hint">Example: AMPIN:ICR/MCR/SWITCHYARD/WTG</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Number of Labour <span style="color:var(--gray-500);font-weight:400;">(Optional)</span></label>
+        <input class="form-input" type="number" id="labour-count" placeholder="Enter count (if applicable)" min="0" oninput="toggleLabourPhoto()">
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">📍</div>
+        <div class="card-title">GPS LOCATION</div>
+      </div>
+      <div id="location-display">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--blue-pale);border-radius:var(--radius-sm);">
+          <div class="spinner" style="display:block;border-top-color:var(--blue-light);"></div>
+          <span style="font-size:13px;color:var(--blue-mid);font-weight:600;">Fetching your location...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selfie -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">🤳</div>
+        <div class="card-title">SELFIE PHOTO</div>
+      </div>
+      <div class="camera-section portrait" id="selfie-cam-container">
+        <div class="camera-placeholder" onclick="openCamera('selfie')">
+          <div class="cam-ico">📷</div>
+          <div class="cam-txt">Tap to open camera</div>
+        </div>
+      </div>
+      <div id="selfie-controls" style="display:none;" class="camera-controls"></div>
+      <div id="selfie-status" class="photo-status pending">⚠️ Selfie not captured</div>
+    </div>
+
+    <!-- Labour Photo (conditional) -->
+    <div class="card" id="labour-photo-card" style="display:none;">
+      <div class="card-header">
+        <div class="card-icon green">👷</div>
+        <div class="card-title">LABOUR PHOTO</div>
+      </div>
+      <div class="camera-section landscape" id="labour-cam-container">
+        <div class="camera-placeholder" onclick="openCamera('labour')">
+          <div class="cam-ico">📸</div>
+          <div class="cam-txt">Tap to open camera (Landscape)</div>
+        </div>
+      </div>
+      <div id="labour-controls" style="display:none;" class="camera-controls"></div>
+      <div id="labour-status" class="photo-status pending">⚠️ Labour photo not captured</div>
+    </div>
+
+    <!-- Submit -->
+    <button class="submit-btn" id="submit-btn" onclick="submitAttendance()">
+      <span class="spinner" id="submit-spinner"></span>
+      <span id="submit-text">📤 SUBMIT ATTENDANCE</span>
+    </button>
+
+  </div><!-- /checkin -->
+
+  <!-- ===== MY ATTENDANCE TAB ===== -->
+  <div id="tab-attendance" class="tab-content">
+
+    <!-- Scorecard -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">📊</div>
+        <div class="card-title">MY SCORECARD</div>
+      </div>
+      <div id="attendance-identity-banner"></div>
+      <div class="scorecard-grid">
+        <div class="score-card">
+          <div class="score-number" id="sc-today">—</div>
+          <div class="score-label">Today</div>
+        </div>
+        <div class="score-card">
+          <div class="score-number" id="sc-week">—</div>
+          <div class="score-label">This Week</div>
+        </div>
+        <div class="score-card green">
+          <div class="score-number" id="sc-month">—</div>
+          <div class="score-label">This Month</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Records -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">🔍</div>
+        <div class="card-title">ATTENDANCE RECORDS</div>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn" onclick="setFilter('today',this)">Today</button>
+        <button class="filter-btn active" onclick="setFilter('weekly',this)">Weekly</button>
+        <button class="filter-btn" onclick="setFilter('monthly',this)">Monthly</button>
+        <button class="filter-btn" onclick="setFilter('custom',this)">Custom</button>
+      </div>
+      <div class="date-range-row" id="custom-range">
+        <input type="date" id="range-from">
+        <input type="date" id="range-to">
+        <button class="apply-filter-btn" onclick="loadAttendance()">Go</button>
+      </div>
+      <div id="attendance-table-wrapper">
+        <div class="empty-state">
+          <div class="empty-ico">📋</div>
+          <div class="empty-txt">Submit attendance to see records</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /attendance -->
+
+</div><!-- /app-wrapper -->
+
+<!-- ===== FIRST TIME SETUP MODAL ===== -->
+<div class="setup-overlay" id="setup-modal">
+  <div class="setup-box">
+    <div class="setup-logo">📍</div>
+    <div class="setup-title">Welcome to FieldTrack</div>
+    <div class="setup-subtitle" id="setup-subtitle">Set up your profile once — we'll remember you forever, even if you switch browsers or devices.</div>
+
+    <div class="setup-field" id="setup-phone-field">
+      <label class="setup-label">📱 Mobile Number <span class="req">*</span></label>
+      <input class="setup-input phone" type="tel" id="setup-phone" placeholder="Enter 10-digit mobile number" maxlength="10" inputmode="numeric">
+      <div class="setup-note"><strong>🔒 This becomes your permanent unique ID.</strong> Works across any browser or device — just enter your number to access your records.</div>
+    </div>
+
+    <div class="setup-field" id="setup-name-field">
+      <label class="setup-label">👤 Your Name <span class="req">*</span></label>
+      <input class="setup-input" type="text" id="setup-name" placeholder="Enter your full name">
+    </div>
+
+    <button class="setup-btn" onclick="saveProfile()">✅ Save &amp; Continue</button>
+  </div>
+</div>
+
+<!-- ===== EDIT PROFILE MODAL ===== -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--blue-dark);margin-bottom:18px;">✏️ Edit Profile</div>
+
+    <div style="margin-bottom:12px;">
+      <label class="form-label">📱 Mobile Number <span style="font-size:10px;font-weight:400;color:var(--gray-500);">(Unique ID — cannot change)</span></label>
+      <div style="padding:12px 14px;background:var(--blue-pale);border-radius:var(--radius-sm);font-size:15px;font-weight:700;color:var(--blue-mid);letter-spacing:1px;" id="edit-phone-display">—</div>
+      <div class="form-hint">📌 Mobile number is your permanent ID and cannot be edited.</div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <label class="form-label">👤 Name <span class="req">*</span></label>
+      <input class="form-input" type="text" id="edit-name" placeholder="Your full name">
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button class="modal-close-btn" style="background:var(--gray-300);color:var(--blue-dark);" onclick="closeEditModal()">Cancel</button>
+      <button class="modal-close-btn" onclick="updateName()">Save Name</button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="success-modal">
+  <div class="modal-box">
+    <div class="modal-success-icon">✅</div>
+    <div class="modal-title">Attendance Submitted!</div>
+    <div id="modal-details"></div>
+    <button class="modal-close-btn" onclick="closeModal()">Done</button>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner-big"></div>
+  <div class="loading-text" id="loading-text">Submitting attendance...</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Hidden elements -->
+<canvas id="selfie-canvas" style="display:none;"></canvas>
+<canvas id="labour-canvas" style="display:none;"></canvas>
+<video id="selfie-video" playsinline style="display:none;"></video>
+<video id="labour-video" playsinline style="display:none;"></video>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwb1AlWBKsbPvM5-qcaur2YpL48ohslPwyy-UhZwb2RCFiKTxsiAG4YqiklJvjqZHkd9Q/exec';
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  date: '', time: '',
+  lat: null, lng: null, address: '',
+  mobileNumber: '',   // ← THE permanent unique ID
+  empName: '',
+  batteryLevel: '',
+  selfieBase64: '', selfieBlob: null,
+  labourBase64: '', labourBlob: null,
+  selfieStream: null, labourStream: null,
+  selfieFlipped: false, labourFlipped: false,
+  currentFilter: 'weekly'
+};
+
+// ============================================================
+// LIVE CLOCK
+// ============================================================
+function updateClock() {
+  const now = new Date();
+  document.getElementById('live-time').textContent =
+    now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('live-date').textContent =
+    now.toLocaleDateString('en-IN', {weekday:'short',day:'2-digit',month:'short'});
+  state.date = now.toLocaleDateString('en-IN', {day:'2-digit',month:'2-digit',year:'numeric'});
+  state.time = now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('disp-date').textContent = state.date;
+  document.getElementById('disp-time').textContent = state.time;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ============================================================
+// BATTERY
+// ============================================================
+async function getBattery() {
+  try {
+    const b = await navigator.getBattery();
+    state.batteryLevel = Math.round(b.level * 100) + '%';
+  } catch { state.batteryLevel = 'N/A'; }
+}
+
+// ============================================================
+// LOCATION
+// ============================================================
+function getLocation() {
+  if (!navigator.geolocation) { showLocationError('Geolocation not supported'); return; }
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      state.lat  = pos.coords.latitude.toFixed(6);
+      state.lng  = pos.coords.longitude.toFixed(6);
+      state.address = await reverseGeocode(state.lat, state.lng);
+      document.getElementById('location-display').innerHTML = `
+        <div class="location-display">
+          <span class="location-icon">📍</span>
+          <div>
+            <div class="location-text">${state.address}</div>
+            <div class="location-coords">${state.lat}, ${state.lng}</div>
+          </div>
+        </div>`;
+    },
+    () => showLocationError('Location access denied. Please allow location.'),
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+}
+
+async function reverseGeocode(lat, lng) {
+  try {
+    const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+    const data = await res.json();
+    if (data && data.address) {
+      const a = data.address, parts = [];
+      if (a.road || a.pedestrian || a.footway) parts.push(a.road || a.pedestrian || a.footway);
+      if (a.suburb || a.neighbourhood)         parts.push(a.suburb || a.neighbourhood);
+      if (a.city   || a.town || a.village)     parts.push(a.city   || a.town || a.village);
+      if (a.state)                             parts.push(a.state);
+      return parts.length ? parts.join(', ') : data.display_name.split(',').slice(0,3).join(',');
+    }
+  } catch(e) {}
+  return `${lat}, ${lng}`;
+}
+
+function showLocationError(msg) {
+  document.getElementById('location-display').innerHTML =
+    `<div style="padding:12px;background:#FFEBEE;border-radius:var(--radius-sm);color:#C62828;font-size:13px;font-weight:600;">⚠️ ${msg}</div>`;
+}
+
+// ============================================================
+// PROFILE — SETUP & MANAGEMENT
+// ============================================================
+function getProfile() {
+  const mobile = localStorage.getItem('ft_mobile');
+  const name   = mobile ? localStorage.getItem('ft_name_' + mobile) : null;
+  return (mobile && name) ? { mobile, name } : null;
+}
+
+function openSetupModal(editMode = false) {
+  const modal = document.getElementById('setup-modal');
+  if (editMode) {
+    // We only let them change name, not mobile. Show edit modal instead.
+    openEditProfile();
+    return;
+  }
+  document.getElementById('setup-phone').value = '';
+  document.getElementById('setup-name').value  = '';
+  document.getElementById('setup-subtitle').textContent =
+    'Set up your profile once — we\'ll remember you forever, even if you switch browsers or devices.';
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('setup-phone').focus(), 300);
+}
+
+function saveProfile() {
+  const phone = document.getElementById('setup-phone').value.trim();
+  const name  = document.getElementById('setup-name').value.trim();
+
+  if (!/^\d{10}$/.test(phone)) {
+    showToast('⚠️ Enter a valid 10-digit mobile number');
+    document.getElementById('setup-phone').focus(); return;
+  }
+  if (!name) {
+    showToast('⚠️ Please enter your name');
+    document.getElementById('setup-name').focus(); return;
+  }
+
+  localStorage.setItem('ft_mobile', phone);
+  localStorage.setItem('ft_name_' + phone, name);
+
+  document.getElementById('setup-modal').classList.remove('open');
+  applyProfile({ mobile: phone, name });
+  showToast('✅ Profile saved! Welcome, ' + name.split(' ')[0]);
+}
+
+function applyProfile(profile) {
+  state.mobileNumber = profile.mobile;
+  state.empName      = profile.name;
+
+  // Update Check-In card
+  document.getElementById('profile-display').style.display = 'block';
+  document.getElementById('profile-name-disp').textContent  = profile.name;
+  document.getElementById('profile-phone-disp').innerHTML   =
+    profile.mobile + ' <span class="verified-badge">✓ ID</span>';
+
+  // Update header pill
+  const pill = document.getElementById('user-pill');
+  pill.style.display = 'flex';
+  document.getElementById('user-pill-name').textContent  = profile.name.split(' ')[0];
+  document.getElementById('user-pill-phone').textContent = profile.mobile;
+  document.getElementById('user-avatar').textContent     = profile.name.charAt(0).toUpperCase();
+
+  // Update attendance banner
+  document.getElementById('attendance-identity-banner').innerHTML = `
+    <div class="identity-banner">
+      <div class="identity-avatar">👤</div>
+      <div class="identity-text">
+        <div class="iname">${profile.name}</div>
+        <div class="iphone">📱 ${profile.mobile} &nbsp;•&nbsp; Records for this number only</div>
+      </div>
+    </div>`;
+}
+
+// ---- Edit Profile (name only) ----
+function openEditProfile() {
+  const profile = getProfile();
+  if (!profile) { openSetupModal(); return; }
+  document.getElementById('edit-phone-display').textContent = profile.mobile;
+  document.getElementById('edit-name').value = profile.name;
+  document.getElementById('edit-modal').classList.add('open');
+  setTimeout(() => document.getElementById('edit-name').focus(), 200);
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+function updateName() {
+  const newName = document.getElementById('edit-name').value.trim();
+  if (!newName) { showToast('⚠️ Name cannot be empty'); return; }
+  const mobile = localStorage.getItem('ft_mobile');
+  localStorage.setItem('ft_name_' + mobile, newName);
+  closeEditModal();
+  applyProfile({ mobile, name: newName });
+  showToast('✅ Name updated to ' + newName);
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'attendance') loadAttendance();
+}
+
+// ============================================================
+// LABOUR PHOTO TOGGLE
+// ============================================================
+function toggleLabourPhoto() {
+  const val  = parseInt(document.getElementById('labour-count').value);
+  const card = document.getElementById('labour-photo-card');
+  card.style.display = (val && val > 0) ? 'block' : 'none';
+}
+
+// ============================================================
+// CAMERA
+// ============================================================
+async function openCamera(type) {
+  const isPortrait = type === 'selfie';
+  const facingMode = type === 'selfie' ? 'user' : 'environment';
+  const video     = document.getElementById(type + '-video');
+  const container = document.getElementById(type + '-cam-container');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: facingMode },
+        width:  isPortrait ? { ideal: 720  } : { ideal: 1280 },
+        height: isPortrait ? { ideal: 1280 } : { ideal: 720  }
+      }
+    });
+    if (type === 'selfie') state.selfieStream = stream;
+    else                   state.labourStream = stream;
+
+    video.srcObject = stream; video.play();
+    container.innerHTML = '';
+    video.style.display = 'block'; video.className = 'camera-feed';
+    container.appendChild(video);
+
+    const switchBtn = document.createElement('button');
+    switchBtn.className = 'cam-btn switch-btn';
+    switchBtn.innerHTML = '🔄 Switch';
+    switchBtn.onclick   = () => switchCamera(type);
+    container.appendChild(switchBtn);
+
+    const controls = document.getElementById(type + '-controls');
+    controls.style.display = 'flex';
+    controls.innerHTML = `<button class="cam-btn green" onclick="capturePhoto('${type}')">📸 Capture</button>`;
+  } catch(e) {
+    showToast('⚠️ Camera access denied. Please allow camera.');
+  }
+}
+
+async function switchCamera(type) {
+  if (type === 'selfie') state.selfieFlipped = !state.selfieFlipped;
+  else                   state.labourFlipped = !state.labourFlipped;
+  const key = type === 'selfie' ? 'selfieStream' : 'labourStream';
+  if (state[key]) state[key].getTracks().forEach(t => t.stop());
+  await openCamera(type);
+}
+
+function capturePhoto(type) {
+  const video     = document.getElementById(type + '-video');
+  const canvas    = document.getElementById(type + '-canvas');
+  const container = document.getElementById(type + '-cam-container');
+  canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const key = type === 'selfie' ? 'selfieStream' : 'labourStream';
+  if (state[key]) state[key].getTracks().forEach(t => t.stop());
+  video.style.display = 'none';
+
+  canvas.toBlob(blob => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const b64 = e.target.result.split(',')[1];
+      if (type === 'selfie') { state.selfieBase64 = b64; state.selfieBlob = blob; }
+      else                   { state.labourBase64 = b64; state.labourBlob = blob; }
+    };
+    reader.readAsDataURL(blob);
+  }, 'image/jpeg', 0.65);
+
+  container.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = canvas.toDataURL('image/jpeg', 0.65);
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+  container.appendChild(img);
+
+  document.getElementById(type + '-controls').style.display = 'flex';
+  document.getElementById(type + '-controls').innerHTML =
+    `<button class="cam-btn outline" onclick="retakePhoto('${type}')">🔄 Retake</button>`;
+  const status = document.getElementById(type + '-status');
+  status.className = 'photo-status captured';
+  status.textContent = '✅ Photo captured successfully';
+}
+
+function retakePhoto(type) {
+  const container = document.getElementById(type + '-cam-container');
+  container.innerHTML = `<div class="camera-placeholder" onclick="openCamera('${type}')">
+    <div class="cam-ico">📷</div><div class="cam-txt">Tap to open camera</div></div>`;
+  document.getElementById(type + '-controls').style.display = 'none';
+  document.getElementById(type + '-status').className = 'photo-status pending';
+  document.getElementById(type + '-status').textContent = '⚠️ Photo not captured';
+  if (type === 'selfie') { state.selfieBase64 = ''; state.selfieBlob = null; }
+  else                   { state.labourBase64 = ''; state.labourBlob = null; }
+}
+
+// ============================================================
+// SUBMIT
+// ============================================================
+async function submitAttendance() {
+  // Check profile
+  if (!state.mobileNumber) { showToast('⚠️ Please complete your profile first'); openSetupModal(); return; }
+  const siteDetails = document.getElementById('site-details').value.trim();
+  const labourCount = document.getElementById('labour-count').value.trim();
+
+  if (!siteDetails)         { showToast('⚠️ Site details are required'); document.getElementById('site-details').focus(); return; }
+  if (!state.selfieBase64)  { showToast('⚠️ Please capture your selfie'); return; }
+  if (!state.lat)           { showToast('⚠️ Location not captured. Please wait or refresh.'); return; }
+  if (labourCount && parseInt(labourCount) > 0 && !state.labourBase64) {
+    showToast('⚠️ Please capture labour photo'); return;
+  }
+
+  document.getElementById('loading-overlay').classList.add('show');
+  document.getElementById('loading-text').textContent = 'Submitting attendance...';
+  document.getElementById('submit-btn').disabled = true;
+
+  try {
+    const now       = new Date();
+    const dateStr   = now.toLocaleDateString('en-IN', {day:'2-digit',month:'2-digit',year:'numeric'});
+    const timeStr   = now.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const safeName  = state.empName.replace(/[^a-zA-Z0-9]/g,'_');
+    const safeSite  = siteDetails.replace(/[^a-zA-Z0-9]/g,'_');
+    const ts        = dateStr.replace(/\//g,'-') + '_' + timeStr.replace(/:/g,'-');
+
+    const payload = {
+      action: 'checkin',
+      date: dateStr, time: timeStr,
+      empName: state.empName,
+      mobileNumber: state.mobileNumber,
+      siteDetails, labourCount: labourCount || '0',
+      lat: state.lat, lng: state.lng, address: state.address,
+      batteryLevel: state.batteryLevel,
+      selfieBase64: state.selfieBase64,
+      selfieFileName: `${safeName}_${ts}.jpg`,
+      labourBase64: state.labourBase64 || '',
+      labourFileName: state.labourBase64 ? `${safeSite}_${ts}.jpg` : ''
+    };
+
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+    document.getElementById('loading-overlay').classList.remove('show');
+
+    if (result.success) {
+      // Cache locally keyed by mobile number
+      const key    = 'att_' + state.mobileNumber;
+      const local  = JSON.parse(localStorage.getItem(key) || '[]');
+      local.push({ date: dateStr, time: timeStr, empName: state.empName, siteDetails, labourCount: labourCount||'0' });
+      localStorage.setItem(key, JSON.stringify(local));
+
+      showSuccessModal(dateStr, timeStr, state.empName, siteDetails, labourCount);
+      resetForm();
+    } else {
+      showToast('❌ Error: ' + (result.message || 'Submission failed'));
+    }
+  } catch(e) {
+    document.getElementById('loading-overlay').classList.remove('show');
+    showToast('❌ Network error. Please check connection.');
+    console.error(e);
+  }
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function resetForm() {
+  document.getElementById('site-details').value  = '';
+  document.getElementById('labour-count').value  = '';
+  retakePhoto('selfie'); retakePhoto('labour');
+  document.getElementById('labour-photo-card').style.display = 'none';
+  getLocation();
+}
+
+// ============================================================
+// SUCCESS MODAL
+// ============================================================
+function showSuccessModal(date, time, empName, site, labour) {
+  const rows = [
+    {k:'📅 Date',     v: date},
+    {k:'⏱ Time',     v: time},
+    {k:'👤 Name',     v: empName},
+    {k:'📱 Mobile',   v: state.mobileNumber},
+    {k:'📍 Site',     v: site},
+    {k:'👷 Labour',   v: labour || '0'}
+  ];
+  document.getElementById('modal-details').innerHTML =
+    rows.map(r => `<div class="modal-detail-row">
+      <span class="modal-detail-key">${r.k}</span>
+      <span class="modal-detail-val">${r.v}</span>
+    </div>`).join('');
+  document.getElementById('success-modal').classList.add('open');
+}
+function closeModal() { document.getElementById('success-modal').classList.remove('open'); }
+
+// ============================================================
+// MY ATTENDANCE — loaded by MOBILE NUMBER
+// ============================================================
+async function loadAttendance() {
+  const mobile = state.mobileNumber;
+  if (!mobile) {
+    document.getElementById('attendance-table-wrapper').innerHTML =
+      `<div class="empty-state"><div class="empty-ico">📱</div><div class="empty-txt">Please complete your profile to view records</div></div>`;
+    return;
+  }
+
+  const wrapper   = document.getElementById('attendance-table-wrapper');
+  const { from, to } = getFilterDates();
+  let records = [];
+
+  try {
+    if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
+      const res  = await fetch(`${APPS_SCRIPT_URL}?action=getAttendance&mobile=${mobile}&from=${from}&to=${to}`);
+      const data = await res.json();
+      if (data.success) records = data.records;
+    } else {
+      records = JSON.parse(localStorage.getItem('att_' + mobile) || '[]');
+      records = filterByDate(records, from, to);
+    }
+  } catch(e) {
+    records = JSON.parse(localStorage.getItem('att_' + mobile) || '[]');
+    records = filterByDate(records, from, to);
+  }
+
+  updateScorecard(records);
+
+  if (!records.length) {
+    wrapper.innerHTML = `<div class="empty-state"><div class="empty-ico">📋</div><div class="empty-txt">No records found for this period</div></div>`;
+    return;
+  }
+
+  wrapper.innerHTML = `<div style="overflow-x:auto;"><table class="attendance-table">
+    <thead><tr><th>Date</th><th>Time</th><th>Status</th><th>Labour</th><th>Site</th></tr></thead>
+    <tbody>${records.map(r => `<tr>
+      <td>${r.date}</td>
+      <td style="font-size:11px;">${r.time || '—'}</td>
+      <td><span class="badge present">Present</span></td>
+      <td>${r.labourCount || '0'}</td>
+      <td style="font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.siteDetails}">${r.siteDetails || '—'}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+
+function filterByDate(records, from, to) {
+  const fromD = new Date(from), toD = new Date(to);
+  return records.filter(r => {
+    const p = r.date.split('/');
+    const d = new Date(p[2], p[1]-1, p[0]);
+    return d >= fromD && d <= toD;
+  });
+}
+
+function updateScorecard(records) {
+  const today     = new Date();
+  const todayStr  = today.toLocaleDateString('en-IN', {day:'2-digit',month:'2-digit',year:'numeric'});
+  const weekStart = new Date(today); weekStart.setDate(today.getDate() - today.getDay());
+  const monthStart= new Date(today.getFullYear(), today.getMonth(), 1);
+
+  const dateOf = r => { const p = r.date.split('/'); return new Date(p[2], p[1]-1, p[0]); };
+
+  document.getElementById('sc-today').textContent  = records.filter(r => r.date === todayStr).length > 0 ? '✓' : '—';
+  document.getElementById('sc-week').textContent   = records.filter(r => dateOf(r) >= weekStart && dateOf(r) <= today).length;
+  document.getElementById('sc-month').textContent  = records.filter(r => dateOf(r) >= monthStart && dateOf(r) <= today).length;
+}
+
+function getFilterDates() {
+  const today = new Date();
+  const to    = today.toISOString().split('T')[0];
+  let from;
+  if      (state.currentFilter === 'today')   { from = to; }
+  else if (state.currentFilter === 'weekly')  { const d = new Date(today); d.setDate(d.getDate()-7); from = d.toISOString().split('T')[0]; }
+  else if (state.currentFilter === 'monthly') { from = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]; }
+  else {
+    from = document.getElementById('range-from').value || to;
+    return { from, to: document.getElementById('range-to').value || to };
+  }
+  return { from, to };
+}
+
+function setFilter(type, btn) {
+  state.currentFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('custom-range').classList.toggle('show', type === 'custom');
+  if (type !== 'custom') loadAttendance();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+async function init() {
+  await getBattery();
+  getLocation();
+  setInterval(getLocation, 120000);
+
+  const profile = getProfile();
+  if (profile) {
+    applyProfile(profile);
+  } else {
+    // First time — show setup
+    openSetupModal();
+  }
+}
+
+init();
+</script>
+</body>
+</html>

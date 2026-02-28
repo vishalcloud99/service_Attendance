@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Service Team Attendance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1f44;
+    --dark-green: #064e3b;
+    --blue: #1a4fba;
+    --green: #059669;
+    --green-light: #d1fae5;
+    --blue-light: #dbeafe;
+    --card-bg: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --input-bg: #f8fafc;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(10,31,68,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(160deg, var(--navy) 0%, var(--dark-green) 100%);
+    min-height: 100vh;
+    color: var(--text-primary);
+    overflow-x: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    padding: 20px 20px 0;
+    color: white;
+    position: relative;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .brand {
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .brand span { opacity: 0.7; font-weight: 600; }
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    background: #4ade80;
+    border-radius: 50%;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { transform: scale(1); opacity:1; }
+    50% { transform: scale(1.5); opacity:0.6; }
+  }
+  .header-clock {
+    font-size: 12px;
+    opacity: 0.75;
+    font-weight: 500;
+    margin-bottom: 16px;
+    letter-spacing: 0.2px;
+  }
+
+  /* ─── TAB BAR ─── */
+  .tab-bar {
+    display: flex;
+    gap: 6px;
+    padding: 0 20px;
+    margin-bottom: 0;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 12px 12px 0 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+  }
+  .tab-btn.active {
+    background: white;
+    color: var(--navy);
+  }
+
+  /* ─── MAIN CARD ─── */
+  .main-card {
+    background: var(--card-bg);
+    border-radius: 24px 24px 0 0;
+    min-height: calc(100vh - 130px);
+    padding: 24px 20px 40px;
+    animation: slide-up 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes slide-up {
+    from { transform: translateY(60px); opacity:0; }
+    to { transform: translateY(0); opacity:1; }
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ─── SECTION BLOCKS ─── */
+  .section-block {
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .section-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .icon-blue { background: var(--blue-light); }
+  .icon-green { background: var(--green-light); }
+  .icon-orange { background: #fff7ed; }
+  .icon-purple { background: #ede9fe; }
+  .section-meta { flex: 1; }
+  .section-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .section-subtitle {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  /* ─── ATTENDANCE ID BOX ─── */
+  .attendance-id-box {
+    background: linear-gradient(135deg, var(--navy), var(--blue));
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .att-id-label { font-size: 11px; color: rgba(255,255,255,0.65); font-weight: 600; margin-bottom: 4px; letter-spacing: 0.5px; }
+  .att-id-value { font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900; color: white; letter-spacing: 1px; }
+  .att-id-icon { font-size: 28px; opacity: 0.4; }
+
+  /* ─── DATETIME ─── */
+  .datetime-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .datetime-chip {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .chip-label { font-size: 10px; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .chip-value { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: var(--text-primary); }
+
+  /* ─── INPUTS ─── */
+  label.field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+  }
+  input[type="text"], input[type="number"], input[type="date"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-primary);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: var(--blue); }
+  input.autofilled { border-color: var(--green); background: #f0fdf4; }
+
+  /* ─── LOCATION ─── */
+  .location-display {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 48px;
+  }
+  .location-text {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  .location-text.loading { color: var(--text-secondary); font-style: italic; }
+  .location-refresh {
+    background: var(--blue-light);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ─── CAMERA ─── */
+  .camera-wrap {
+    position: relative;
+    background: #0f172a;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .camera-wrap.selfie { aspect-ratio: 4/3; }
+  .camera-wrap video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .camera-wrap canvas { display: none; }
+  .camera-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+    pointer-events: none;
+  }
+  .camera-overlay.hidden { display: none; }
+  .camera-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .cam-btn {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .cam-btn:active { opacity: 0.75; }
+  .cam-btn-primary { background: var(--green); color: white; }
+  .cam-btn-secondary { background: var(--blue-light); color: var(--blue); }
+  .cam-btn-danger { background: #fee2e2; color: var(--danger); }
+
+  /* ─── SELFIE STRIP ─── */
+  .selfie-strip {
+    display: none;
+    background: #f0fdf4;
+    border: 1.5px solid #86efac;
+    border-radius: 10px;
+    padding: 10px 12px;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .selfie-strip.visible { display: flex; }
+  .selfie-thumb {
+    width: 48px; height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px solid #4ade80;
+    flex-shrink: 0;
+  }
+  .selfie-strip-meta { flex: 1; }
+  .selfie-strip-name { font-size: 12px; font-weight: 600; color: #166534; word-break: break-all; }
+  .selfie-strip-size { font-size: 11px; color: #4ade80; margin-top: 2px; }
+  .selfie-retake {
+    background: none;
+    border: 1.5px solid #86efac;
+    color: #15803d;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  /* ─── STATUS DOTS ─── */
+  .status-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 16px 0 8px;
+    flex-wrap: wrap;
+  }
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: white;
+    border: 1.5px solid var(--border);
+    color: var(--text-secondary);
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #94a3b8;
+    transition: background 0.3s;
+  }
+  .status-dot.ready { background: var(--green); }
+  .status-dot.error { background: var(--danger); }
+  .status-dot.loading { background: var(--warning); animation: pulse-dot 1s infinite; }
+
+  /* ─── SUBMIT BTN ─── */
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--blue), #2563eb);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 16px rgba(26,79,186,0.35);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,31,68,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 28px 24px 40px;
+    width: 100%;
+    max-width: 480px;
+    animation: spring-up 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  @keyframes spring-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    margin: 0 auto 20px;
+  }
+  .modal-icon { font-size: 48px; text-align: center; margin-bottom: 10px; }
+  .modal-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    text-align: center;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .modal-subtitle { text-align: center; font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+  .modal-summary {
+    background: var(--input-bg);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .summary-row { display: flex; gap: 10px; align-items: flex-start; }
+  .summary-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; min-width: 80px; margin-top: 2px; }
+  .summary-value { font-size: 13px; font-weight: 600; color: var(--text-primary); flex: 1; word-break: break-all; }
+  .modal-close-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--green), #10b981);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  /* ─── MY ATTENDANCE TAB ─── */
+  .device-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--navy), var(--blue));
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    color: white;
+  }
+  .device-badge-icon { font-size: 22px; }
+  .device-badge-id { font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 0.5px; }
+  .device-badge-label { font-size: 10.5px; opacity: 0.65; font-weight: 500; }
+
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .stat-chip {
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Nunito', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--blue);
+  }
+  .stat-label { font-size: 10.5px; color: var(--text-secondary); font-weight: 600; margin-top: 2px; }
+
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    margin-bottom: 10px;
+    scrollbar-width: none;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-btn {
+    white-space: nowrap;
+    padding: 7px 14px;
+    border: 1.5px solid var(--border);
+    background: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .filter-btn.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
+  }
+
+  .custom-date-row {
+    display: none;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+  .custom-date-row.visible { display: flex; }
+  .custom-date-row input[type="date"] {
+    flex: 1;
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+  .apply-btn {
+    padding: 9px 14px;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .active-filter-label {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    display: none;
+  }
+  .active-filter-label.visible { display: block; }
+  .active-filter-label strong { color: var(--blue); }
+
+  .search-bar {
+    position: relative;
+    margin-bottom: 14px;
+  }
+  .search-bar input {
+    padding-left: 36px;
+    background: var(--input-bg);
+    border-color: var(--border);
+  }
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    color: var(--text-secondary);
+    pointer-events: none;
+  }
+
+  .attendance-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .visit-card {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .visit-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .visit-site {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-primary);
+    flex: 1;
+  }
+  .visit-time-badge {
+    background: var(--blue-light);
+    color: var(--blue);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .visit-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .visit-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .visit-att-id {
+    font-family: 'Nunito', sans-serif;
+    font-size: 10.5px;
+    color: var(--text-secondary);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+
+  .labour-badge {
+    background: var(--green-light);
+    color: #065f46;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-secondary);
+  }
+  .empty-state-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .empty-state-sub { font-size: 13px; line-height: 1.5; }
+
+  .att-tab-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .att-tab-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--text-primary);
+  }
+  .refresh-btn {
+    background: var(--blue-light);
+    border: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--blue);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  /* ─── DEMO BANNER ─── */
+  .demo-banner {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1.5px solid #f59e0b;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #92400e;
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Spinner */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="brand">Service Team <span>Attendance</span></div>
+    <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+  </div>
+  <div class="header-clock" id="headerClock">Loading...</div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('checkin')">☀️ Check-In</button>
+  <button class="tab-btn" onclick="switchTab('attendance')">📋 My Attendance</button>
+</div>
+
+<div class="main-card">
+
+  <!-- ═══════════════ TAB 1: CHECK-IN ═══════════════ -->
+  <div id="tab-checkin" class="tab-content active">
+
+    <div id="demoBanner" class="demo-banner" style="display:none">
+      ⚠️ Demo Mode — Data saved to device storage only. Set SCRIPT_URL to connect backend.
+    </div>
+
+    <!-- Attendance ID -->
+    <div class="attendance-id-box">
+      <div>
+        <div class="att-id-label">ATTENDANCE ID</div>
+        <div class="att-id-value" id="attendanceId">--</div>
+      </div>
+      <div class="att-id-icon">🪪</div>
+    </div>
+
+    <!-- Date & Time -->
+    <div class="section-block">
+      <div class="section-header">
+        <div class="section-icon icon-blue">🕐</div>
+        <div class="section-meta">
+          <div class="section-title">Date & Time</div>
+          <div class="section-subtitle">Auto-updated every second</div>
+        </div>
+      </div>
+      <div class="datetime-row">
+        <div class="datetime-chip">
+          <div class="chip-label">DATE</div>
+          <div class="chip-value" id="dispDate">--</div>
+        </div>
+        <div class="datetime-chip">
+          <div class="chip-label">TIME</div>
+          <div class="chip-value" id="dispTime">--</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employee Name -->
+    <div class="section-block">
+      <div class="section-header">
+        <div class="section-icon icon-purple">👤</div>
+        <div class="section-meta">
+          <div class="section-title">Employee Name</div>
+          <div class="section-subtitle">Green border = auto-filled from last visit</div>
+        </div>
+      </div>
+      <label class="field-label">Full Name *</label>
+      <input type="text" id="empName" placeholder="Enter your name..." oninput="saveEmpName(this.value)">
+    </div>
+
+    <!-- Site -->
+    <div class="section-block">
+      <div class="section-header">
+        <div class="section-icon icon-orange">🏗️</div>
+        <div class="section-meta">
+          <div class="section-title">Site Information</div>
+          <div class="section-subtitle">Enter the site you are visiting today</div>
+        </div>
+      </div>
+      <label class="field-label">Site Name *</label>
+      <input type="text" id="siteName" placeholder="e.g. Building A, Warehouse 3...">
+      <div style="height:10px"></div>
+      <label class="field-label">Number of Labours *</label>
+      <input type="number" id="numLabours" min="0" placeholder="0" oninput="onLabourChange(this.value)">
+    </div>
+
+    <!-- Location -->
+    <div class="section-block">
+      <div class="section-header">
+        <div class="section-icon icon-green">📍</div>
+        <div class="section-meta">
+          <div class="section-title">Current Location</div>
+          <div class="section-subtitle">GPS auto-detected & reverse geocoded</div>
+        </div>
+      </div>
+      <div class="location-display">
+        <span style="font-size:18px">📡</span>
+        <div class="location-text loading" id="locationText">Detecting location...</div>
+        <button class="location-refresh" onclick="detectLocation()" title="Refresh">🔄</button>
+      </div>
+    </div>
+
+    <!-- Live Selfie -->
+    <div class="section-block">
+      <div class="section-header">
+        <div class="section-icon icon-blue">🤳</div>
+        <div class="section-meta">
+          <div class="section-title">Live Selfie</div>
+          <div class="section-subtitle">Front camera · No uploads allowed</div>
+        </div>
+      </div>
+      <div class="camera-wrap selfie" id="selfieWrap">
+        <video id="selfieVideo" autoplay playsinline muted></video>
+        <canvas id="selfieCanvas"></canvas>
+        <div class="camera-overlay" id="selfieOverlay">
+          <span style="font-size:40px">📷</span>
+          <span>Camera not started</span>
+        </div>
+      </div>
+      <div class="camera-actions">
+        <button class="cam-btn cam-btn-secondary" id="selfieStartBtn" onclick="startCamera('selfie')">▶ Start Camera</button>
+        <button class="cam-btn cam-btn-primary" id="selfieSnapBtn" onclick="snapPhoto('selfie')" style="display:none">📸 Capture</button>
+      </div>
+      <div class="selfie-strip" id="selfiStrip">
+        <img class="selfie-thumb" id="selfieThumb" src="">
+        <div class="selfie-strip-meta">
+          <div class="selfie-strip-name" id="selfieFileName">--</div>
+          <div class="selfie-strip-size" id="selfieFileSize">--</div>
+        </div>
+        <button class="selfie-retake" onclick="retakePhoto('selfie')">Retake</button>
+      </div>
+    </div>
+
+    <!-- Labours Photo -->
+    <div class="section-block" id="laboursPhotoSection" style="display:none">
+      <div class="section-header">
+        <div class="section-icon icon-orange">👷</div>
+        <div class="section-meta">
+          <div class="section-title">Labours Photo</div>
+          <div class="section-subtitle">Back/Front camera · No uploads allowed</div>
+        </div>
+      </div>
+      <div class="camera-wrap" id="laboursWrap">
+        <video id="laboursVideo" autoplay playsinline muted></video>
+        <canvas id="laboursCanvas"></canvas>
+        <div class="camera-overlay" id="laboursOverlay">
+          <span style="font-size:40px">📷</span>
+          <span>Camera not started</span>
+        </div>
+      </div>
+      <div class="camera-actions">
+        <button class="cam-btn cam-btn-secondary" id="laboursStartBtn" onclick="startCamera('labours')">▶ Start Camera</button>
+        <button class="cam-btn cam-btn-primary" id="laboursSnapBtn" onclick="snapPhoto('labours')" style="display:none">📸 Capture</button>
+      </div>
+      <div class="selfie-strip" id="laboursStrip">
+        <img class="selfie-thumb" id="laboursThumb" src="">
+        <div class="selfie-strip-meta">
+          <div class="selfie-strip-name" id="laboursFileName">--</div>
+          <div class="selfie-strip-size" id="laboursFileSize">--</div>
+        </div>
+        <button class="selfie-retake" onclick="retakePhoto('labours')">Retake</button>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-pill"><div class="status-dot" id="dotCamera"></div> Camera</div>
+      <div class="status-pill"><div class="status-dot" id="dotLocation"></div> Location</div>
+      <div class="status-pill"><div class="status-dot" id="dotNetwork"></div> Network</div>
+    </div>
+
+    <!-- Submit -->
+    <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">
+      <span id="submitBtnText">✅ Submit Check-In</span>
+    </button>
+
+  </div>
+
+  <!-- ═══════════════ TAB 2: MY ATTENDANCE ═══════════════ -->
+  <div id="tab-attendance" class="tab-content">
+
+    <div class="device-badge">
+      <div class="device-badge-icon">📱</div>
+      <div>
+        <div class="device-badge-label">THIS DEVICE</div>
+        <div class="device-badge-id" id="deviceBadgeId">--</div>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-chip"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total</div></div>
+      <div class="stat-chip"><div class="stat-num" id="statWeek">0</div><div class="stat-label">This Week</div></div>
+      <div class="stat-chip"><div class="stat-num" id="statMonth">0</div><div class="stat-label">This Month</div></div>
+    </div>
+
+    <div class="att-tab-header">
+      <div class="att-tab-title">My Visits</div>
+      <button class="refresh-btn" onclick="loadAttendance()">🔄 Refresh</button>
+    </div>
+
+    <div class="filter-row">
+      <button class="filter-btn active" data-filter="today" onclick="setFilter('today',this)">Today</button>
+      <button class="filter-btn" data-filter="yesterday" onclick="setFilter('yesterday',this)">Yesterday</button>
+      <button class="filter-btn" data-filter="week" onclick="setFilter('week',this)">This Week</button>
+      <button class="filter-btn" data-filter="month" onclick="setFilter('month',this)">This Month</button>
+      <button class="filter-btn" data-filter="all" onclick="setFilter('all',this)">All Time</button>
+      <button class="filter-btn" data-filter="custom" onclick="setFilter('custom',this)">Custom 📅</button>
+    </div>
+
+    <div class="custom-date-row" id="customDateRow">
+      <input type="date" id="customFrom" placeholder="From">
+      <span style="color:#94a3b8;font-weight:700">→</span>
+      <input type="date" id="customTo" placeholder="To">
+      <button class="apply-btn" onclick="applyCustomFilter()">Apply</button>
+    </div>
+
+    <div class="active-filter-label" id="activeFilterLabel"></div>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by site name..." oninput="renderAttendance()">
+    </div>
+
+    <div class="attendance-list" id="attendanceList">
+      <div class="empty-state">
+        <div class="empty-state-icon">⏳</div>
+        <div class="empty-state-title">Loading...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal-box">
+    <div class="modal-handle"></div>
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title">Check-In Successful!</div>
+    <div class="modal-subtitle">Your attendance has been recorded</div>
+    <div class="modal-summary" id="modalSummary"></div>
+    <button class="modal-close-btn" onclick="closeModal()">✓ Done</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  CONFIGURATION — Paste your deployed Apps Script Web App URL here
+// ═══════════════════════════════════════════════
+const SCRIPT_URL = ''; // e.g. 'https://script.google.com/macros/s/AKfycby.../exec'
+
+// ═══════════════════════════════════════════════
+//  GLOBALS
+// ═══════════════════════════════════════════════
+let deviceFingerprint = '';
+let locationData = { address: '', lat: '', lng: '' };
+let selfieBase64 = '';
+let laboursBase64 = '';
+let selfieStream = null;
+let laboursStream = null;
+let currentFilter = 'today';
+let customFilterRange = null;
+let allVisits = [];
+let batteryInfo = { level: null, charging: null };
+let clockInterval = null;
+
+const DEMO_MODE = !SCRIPT_URL;
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+  deviceFingerprint = generateFingerprint();
+  document.getElementById('deviceBadgeId').textContent = deviceFingerprint;
+
+  if (DEMO_MODE) {
+    document.getElementById('demoBanner').style.display = 'flex';
+  }
+
+  startClock();
+  generateAttId();
+  loadEmpName();
+  detectLocation();
+  getBattery();
+  checkNetwork();
+  window.addEventListener('online', checkNetwork);
+  window.addEventListener('offline', checkNetwork);
+
+  // Load attendance tab
+  loadAttendance();
+});
+
+// ═══════════════════════════════════════════════
+//  CLOCK
+// ═══════════════════════════════════════════════
+function startClock() {
+  function tick() {
+    const now = new Date();
+    const dateStr = formatDate(now);
+    const timeStr = formatTime(now);
+    document.getElementById('dispDate').textContent = dateStr;
+    document.getElementById('dispTime').textContent = timeStr;
+    document.getElementById('headerClock').textContent = `${dateStr} · ${timeStr}`;
+  }
+  tick();
+  clockInterval = setInterval(tick, 1000);
+}
+
+function formatDate(d) {
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const yyyy = d.getFullYear();
+  return `${dd}-${mm}-${yyyy}`;
+}
+function formatTime(d) {
+  return d.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true });
+}
+function formatTimeShort(d) {
+  const hh = String(d.getHours()).padStart(2,'0');
+  const mm = String(d.getMinutes()).padStart(2,'0');
+  return `${hh}${mm}`;
+}
+
+// ═══════════════════════════════════════════════
+//  FINGERPRINT
+// ═══════════════════════════════════════════════
+function generateFingerprint() {
+  const saved = localStorage.getItem('deviceFP');
+  if (saved) return saved;
+  const raw = [
+    navigator.userAgent,
+    navigator.language,
+    screen.width, screen.height, screen.colorDepth,
+    navigator.hardwareConcurrency,
+    navigator.platform,
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+  ].join('|');
+  let hash = 2166136261;
+  for (let i = 0; i < raw.length; i++) {
+    hash ^= raw.charCodeAt(i);
+    hash = (hash * 16777619) >>> 0;
+  }
+  const fp = 'DEV-' + hash.toString(16).toUpperCase().padStart(8,'0');
+  localStorage.setItem('deviceFP', fp);
+  return fp;
+}
+
+// ═══════════════════════════════════════════════
+//  ATTENDANCE ID
+// ═══════════════════════════════════════════════
+function generateAttId() {
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(2);
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const dd = String(now.getDate()).padStart(2,'0');
+  const hh = String(now.getHours()).padStart(2,'0');
+  const min = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('attendanceId').textContent = `AD${yy}${mm}${dd}${hh}${min}${ss}`;
+}
+
+// ═══════════════════════════════════════════════
+//  EMP NAME
+// ═══════════════════════════════════════════════
+function loadEmpName() {
+  const saved = localStorage.getItem('empName_' + deviceFingerprint);
+  const el = document.getElementById('empName');
+  if (saved) {
+    el.value = saved;
+    el.classList.add('autofilled');
+  }
+  el.addEventListener('input', () => el.classList.remove('autofilled'));
+}
+function saveEmpName(val) {
+  if (val.trim()) localStorage.setItem('empName_' + deviceFingerprint, val.trim());
+}
+
+// ═══════════════════════════════════════════════
+//  LOCATION
+// ═══════════════════════════════════════════════
+function detectLocation() {
+  const el = document.getElementById('locationText');
+  el.textContent = 'Detecting location...';
+  el.className = 'location-text loading';
+  setDot('dotLocation', 'loading');
+
+  if (!navigator.geolocation) {
+    el.textContent = 'Geolocation not supported';
+    el.className = 'location-text';
+    setDot('dotLocation', 'error');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const lat = pos.coords.latitude.toFixed(6);
+    const lng = pos.coords.longitude.toFixed(6);
+    locationData.lat = lat;
+    locationData.lng = lng;
+
+    el.textContent = 'Reverse geocoding...';
+
+    // Try Nominatim
+    try {
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`, {
+        headers: { 'Accept-Language': 'en' }
+      });
+      const j = await r.json();
+      if (j && j.display_name) {
+        locationData.address = j.display_name;
+        el.textContent = j.display_name;
+        el.className = 'location-text';
+        setDot('dotLocation', 'ready');
+        return;
+      }
+    } catch(_) {}
+
+    // Fallback BigDataCloud
+    try {
+      const r2 = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`);
+      const j2 = await r2.json();
+      if (j2 && j2.locality) {
+        const addr = [j2.locality, j2.city, j2.principalSubdivision, j2.countryName].filter(Boolean).join(', ');
+        locationData.address = addr;
+        el.textContent = addr;
+        el.className = 'location-text';
+        setDot('dotLocation', 'ready');
+        return;
+      }
+    } catch(_) {}
+
+    // Last resort: coords
+    const addr = `${lat}, ${lng}`;
+    locationData.address = addr;
+    el.textContent = addr;
+    el.className = 'location-text';
+    setDot('dotLocation', 'ready');
+
+  }, (err) => {
+    el.textContent = 'Location access denied. Please enable GPS.';
+    el.className = 'location-text';
+    setDot('dotLocation', 'error');
+    locationData.address = 'Unknown';
+    locationData.lat = '';
+    locationData.lng = '';
+  }, { enableHighAccuracy: true, timeout: 15000 });
+}
+
+// ═══════════════════════════════════════════════
+//  BATTERY
+// ═══════════════════════════════════════════════
+async function getBattery() {
+  try {
+    const b = await navigator.getBattery();
+    batteryInfo.level = Math.round(b.level * 100);
+    batteryInfo.charging = b.charging;
+  } catch(_) {}
+}
+
+// ═══════════════════════════════════════════════
+//  NETWORK
+// ═══════════════════════════════════════════════
+function checkNetwork() {
+  setDot('dotNetwork', navigator.onLine ? 'ready' : 'error');
+}
+
+// ═══════════════════════════════════════════════
+//  STATUS DOTS
+// ═══════════════════════════════════════════════
+function setDot(id, state) {
+  const el = document.getElementById(id);
+  el.className = 'status-dot ' + state;
+}
+
+// ═══════════════════════════════════════════════
+//  LABOUR COUNT → show/hide photo section
+// ═══════════════════════════════════════════════
+function onLabourChange(val) {
+  const n = parseInt(val) || 0;
+  const section = document.getElementById('laboursPhotoSection');
+  section.style.display = n > 0 ? 'block' : 'none';
+  if (n === 0) {
+    laboursBase64 = '';
+    stopCamera('labours');
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  CAMERA
+// ═══════════════════════════════════════════════
+async function startCamera(type) {
+  const isSelfie = type === 'selfie';
+  const constraints = {
+    video: {
+      facingMode: isSelfie ? 'user' : { ideal: 'environment' },
+      aspectRatio: isSelfie ? 4/3 : 3/4,
+    }
+  };
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    if (isSelfie) {
+      selfieStream = stream;
+      document.getElementById('selfieVideo').srcObject = stream;
+      document.getElementById('selfieOverlay').classList.add('hidden');
+      document.getElementById('selfieStartBtn').style.display = 'none';
+      document.getElementById('selfieSnapBtn').style.display = 'block';
+    } else {
+      laboursStream = stream;
+      document.getElementById('laboursVideo').srcObject = stream;
+      document.getElementById('laboursOverlay').classList.add('hidden');
+      document.getElementById('laboursStartBtn').style.display = 'none';
+      document.getElementById('laboursSnapBtn').style.display = 'block';
+    }
+    setDot('dotCamera', 'ready');
+  } catch(e) {
+    setDot('dotCamera', 'error');
+    alert('Camera access denied. Please allow camera permission and try again.');
+  }
+}
+
+function snapPhoto(type) {
+  const isSelfie = type === 'selfie';
+  const video = document.getElementById(isSelfie ? 'selfieVideo' : 'laboursVideo');
+  const canvas = document.getElementById(isSelfie ? 'selfieCanvas' : 'laboursCanvas');
+
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+
+  const b64 = canvas.toDataURL('image/jpeg', 0.82);
+  const now = new Date();
+  const empName = document.getElementById('empName').value.trim() || 'Unknown';
+  const siteName = document.getElementById('siteName').value.trim() || 'Site';
+  const datePart = formatDate(now);
+  const timePart = formatTimeShort(now);
+
+  if (isSelfie) {
+    selfieBase64 = b64;
+    const fname = `${empName}_${datePart}_${timePart}.jpg`;
+    const size = Math.round((b64.length * 3/4) / 1024);
+    document.getElementById('selfieThumb').src = b64;
+    document.getElementById('selfieFileName').textContent = fname;
+    document.getElementById('selfieFileSize').textContent = `~${size} KB`;
+    document.getElementById('selfiStrip').classList.add('visible');
+    document.getElementById('selfieSnapBtn').style.display = 'none';
+    stopCamera('selfie');
+  } else {
+    laboursBase64 = b64;
+    const fname = `${siteName}_${datePart}_${timePart}.jpg`;
+    const size = Math.round((b64.length * 3/4) / 1024);
+    document.getElementById('laboursThumb').src = b64;
+    document.getElementById('laboursFileName').textContent = fname;
+    document.getElementById('laboursFileSize').textContent = `~${size} KB`;
+    document.getElementById('laboursStrip').classList.add('visible');
+    document.getElementById('laboursSnapBtn').style.display = 'none';
+    stopCamera('labours');
+  }
+}
+
+function retakePhoto(type) {
+  const isSelfie = type === 'selfie';
+  if (isSelfie) {
+    selfieBase64 = '';
+    document.getElementById('selfiStrip').classList.remove('visible');
+    document.getElementById('selfieOverlay').classList.remove('hidden');
+    document.getElementById('selfieStartBtn').style.display = 'block';
+    document.getElementById('selfieSnapBtn').style.display = 'none';
+  } else {
+    laboursBase64 = '';
+    document.getElementById('laboursStrip').classList.remove('visible');
+    document.getElementById('laboursOverlay').classList.remove('hidden');
+    document.getElementById('laboursStartBtn').style.display = 'block';
+    document.getElementById('laboursSnapBtn').style.display = 'none';
+  }
+}
+
+function stopCamera(type) {
+  if (type === 'selfie' && selfieStream) {
+    selfieStream.getTracks().forEach(t => t.stop());
+    selfieStream = null;
+  }
+  if (type === 'labours' && laboursStream) {
+    laboursStream.getTracks().forEach(t => t.stop());
+    laboursStream = null;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  SUBMIT
+// ═══════════════════════════════════════════════
+async function handleSubmit() {
+  const empName = document.getElementById('empName').value.trim();
+  const siteName = document.getElementById('siteName').value.trim();
+  const numLabours = parseInt(document.getElementById('numLabours').value) || 0;
+  const attId = document.getElementById('attendanceId').textContent;
+
+  if (!empName) { alert('Please enter your name.'); return; }
+  if (!siteName) { alert('Please enter the site name.'); return; }
+  if (document.getElementById('numLabours').value === '') { alert('Please enter number of labours.'); return; }
+  if (!selfieBase64) { alert('Please capture your selfie before submitting.'); return; }
+
+  const laboursRequired = numLabours > 0;
+  if (laboursRequired && !laboursBase64) { alert('Please capture the labours photo.'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  document.getElementById('submitBtnText').innerHTML = '<span class="spinner"></span> Submitting...';
+
+  const now = new Date();
+  const payload = {
+    action: 'checkin',
+    attendanceId: attId,
+    date: formatDate(now),
+    time: formatTime(now),
+    empName,
+    siteName,
+    numLabours,
+    fingerprint: deviceFingerprint,
+    battery: batteryInfo.level !== null ? `${batteryInfo.level}%${batteryInfo.charging ? ' ⚡' : ''}` : 'N/A',
+    locationName: locationData.address,
+    lat: locationData.lat,
+    lng: locationData.lng,
+    selfieBase64,
+    laboursBase64: laboursRequired ? laboursBase64 : '',
+  };
+
+  let driveLink = '';
+  if (DEMO_MODE) {
+    // Save to localStorage
+    const key = `attendance_${deviceFingerprint}`;
+    const existing = JSON.parse(localStorage.getItem(key) || '[]');
+    existing.unshift({ ...payload, selfieBase64: '', laboursBase64: '' });
+    localStorage.setItem(key, JSON.stringify(existing));
+    driveLink = '#demo';
+  } else {
+    try {
+      const resp = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await resp.json();
+      driveLink = result.driveLink || '';
+    } catch(e) {
+      alert('Submission failed. Check your network and try again.');
+      btn.disabled = false;
+      document.getElementById('submitBtnText').textContent = '✅ Submit Check-In';
+      return;
+    }
+  }
+
+  showSuccessModal({ ...payload, driveLink });
+
+  btn.disabled = false;
+  document.getElementById('submitBtnText').textContent = '✅ Submit Check-In';
+}
+
+// ═══════════════════════════════════════════════
+//  SUCCESS MODAL
+// ═══════════════════════════════════════════════
+function showSuccessModal(data) {
+  const rows = [
+    { label: 'Att. ID', value: data.attendanceId },
+    { label: 'Name', value: data.empName },
+    { label: 'Site', value: data.siteName },
+    { label: 'Date', value: data.date },
+    { label: 'Time', value: data.time },
+    { label: 'Labours', value: data.numLabours },
+    { label: 'Location', value: data.locationName || 'N/A' },
+  ];
+  if (data.driveLink && data.driveLink !== '#demo') {
+    rows.push({ label: 'Selfie', value: '✅ Saved to Drive' });
+  }
+
+  document.getElementById('modalSummary').innerHTML = rows.map(r => `
+    <div class="summary-row">
+      <div class="summary-label">${r.label}</div>
+      <div class="summary-value">${r.value}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('successModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('successModal').classList.remove('open');
+  resetForm();
+  loadAttendance();
+}
+
+function resetForm() {
+  const empName = document.getElementById('empName').value;
+  document.getElementById('siteName').value = '';
+  document.getElementById('numLabours').value = '';
+  document.getElementById('laboursPhotoSection').style.display = 'none';
+  selfieBase64 = '';
+  laboursBase64 = '';
+  retakePhoto('selfie');
+  document.getElementById('laboursStrip').classList.remove('visible');
+  document.getElementById('laboursOverlay').classList.remove('hidden');
+  document.getElementById('laboursStartBtn').style.display = 'block';
+  document.getElementById('laboursSnapBtn').style.display = 'none';
+  stopCamera('selfie');
+  stopCamera('labours');
+  setTimeout(generateAttId, 500);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 ? 'checkin' : 'attendance') === tab);
+  });
+  document.getElementById('tab-checkin').classList.toggle('active', tab === 'checkin');
+  document.getElementById('tab-attendance').classList.toggle('active', tab === 'attendance');
+  if (tab === 'attendance') loadAttendance();
+}
+
+// ═══════════════════════════════════════════════
+//  ATTENDANCE TAB
+// ═══════════════════════════════════════════════
+async function loadAttendance() {
+  if (DEMO_MODE) {
+    const key = `attendance_${deviceFingerprint}`;
+    let stored = JSON.parse(localStorage.getItem(key) || '[]');
+    if (stored.length === 0) stored = getDemoData();
+    allVisits = stored;
+  } else {
+    try {
+      const url = `${SCRIPT_URL}?action=getattendance&fp=${encodeURIComponent(deviceFingerprint)}`;
+      const resp = await fetch(url);
+      const data = await resp.json();
+      allVisits = data.rows || [];
+    } catch(e) {
+      allVisits = [];
+    }
+  }
+  updateStats();
+  renderAttendance();
+}
+
+function getDemoData() {
+  const now = new Date();
+  const d = (offset) => {
+    const d = new Date(now);
+    d.setDate(d.getDate() - offset);
+    return { date: formatDate(d), time: '09:30:00 AM', rawDate: d };
+  };
+  return [
+    { attendanceId: 'AD250227093000', ...d(0), empName: 'Demo Employee', siteName: 'Warehouse A', numLabours: 5, locationName: 'Demo Location, City' },
+    { attendanceId: 'AD250226143000', ...d(1), empName: 'Demo Employee', siteName: 'Building B', numLabours: 0, locationName: 'Another Site, Town' },
+    { attendanceId: 'AD250225110000', ...d(2), empName: 'Demo Employee', siteName: 'Plant C', numLabours: 12, locationName: 'Plant Area, State' },
+  ];
+}
+
+function updateStats() {
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0,0,0,0);
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  let week = 0, month = 0;
+  for (const v of allVisits) {
+    const d = parseVisitDate(v.date);
+    if (!d) continue;
+    if (d >= startOfWeek) week++;
+    if (d >= startOfMonth) month++;
+  }
+  document.getElementById('statTotal').textContent = allVisits.length;
+  document.getElementById('statWeek').textContent = week;
+  document.getElementById('statMonth').textContent = month;
+}
+
+function parseVisitDate(dateStr) {
+  if (!dateStr) return null;
+  const [dd, mm, yyyy] = dateStr.split('-');
+  if (!dd || !mm || !yyyy) return null;
+  return new Date(parseInt(yyyy), parseInt(mm)-1, parseInt(dd));
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('customDateRow').classList.toggle('visible', filter === 'custom');
+  if (filter !== 'custom') {
+    customFilterRange = null;
+    renderAttendance();
+  }
+  updateActiveFilterLabel();
+}
+
+function applyCustomFilter() {
+  const from = document.getElementById('customFrom').value;
+  const to = document.getElementById('customTo').value;
+  if (!from || !to) { alert('Please select both From and To dates.'); return; }
+  customFilterRange = { from: new Date(from), to: new Date(to + 'T23:59:59') };
+  updateActiveFilterLabel();
+  renderAttendance();
+}
+
+function updateActiveFilterLabel() {
+  const el = document.getElementById('activeFilterLabel');
+  if (currentFilter === 'today' || (currentFilter !== 'custom' && currentFilter !== 'yesterday')) {
+    el.classList.remove('visible');
+    return;
+  }
+  const labels = {
+    yesterday: 'Yesterday',
+    week: 'This Week',
+    month: 'This Month',
+    all: 'All Time',
+  };
+  if (currentFilter === 'custom' && customFilterRange) {
+    el.innerHTML = `Showing: <strong>${document.getElementById('customFrom').value} → ${document.getElementById('customTo').value}</strong>`;
+    el.classList.add('visible');
+  } else if (labels[currentFilter]) {
+    el.innerHTML = `Showing: <strong>${labels[currentFilter]}</strong>`;
+    el.classList.add('visible');
+  }
+}
+
+function filterVisits(visits) {
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yestStart = new Date(todayStart); yestStart.setDate(yestStart.getDate() - 1);
+  const weekStart = new Date(todayStart); weekStart.setDate(weekStart.getDate() - now.getDay());
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  return visits.filter(v => {
+    const d = parseVisitDate(v.date);
+    if (!d) return false;
+    if (currentFilter === 'today') return d >= todayStart;
+    if (currentFilter === 'yesterday') return d >= yestStart && d < todayStart;
+    if (currentFilter === 'week') return d >= weekStart;
+    if (currentFilter === 'month') return d >= monthStart;
+    if (currentFilter === 'all') return true;
+    if (currentFilter === 'custom' && customFilterRange) {
+      return d >= customFilterRange.from && d <= customFilterRange.to;
+    }
+    return true;
+  });
+}
+
+function renderAttendance() {
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  let filtered = filterVisits(allVisits);
+  if (search) {
+    filtered = filtered.filter(v => (v.siteName || v.sitename || '').toLowerCase().includes(search));
+  }
+
+  const list = document.getElementById('attendanceList');
+
+  if (filtered.length === 0) {
+    let msg = 'No visits recorded yet. Do your first check-in!';
+    if (allVisits.length > 0 && search) msg = `No visits found matching "<strong>${search}</strong>".`;
+    else if (allVisits.length > 0) msg = `No visits found for the selected period.`;
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">${search ? '🔍' : '📭'}</div>
+      <div class="empty-state-title">${search ? 'No Results' : 'Nothing Here'}</div>
+      <div class="empty-state-sub">${msg}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(v => {
+    const siteName = v.siteName || v.sitename || 'Unknown Site';
+    const labours = v.numLabours !== undefined ? v.numLabours : (v.numLabour || 0);
+    return `
+    <div class="visit-card">
+      <div class="visit-card-top">
+        <div class="visit-site">🏗️ ${siteName}</div>
+        <div class="visit-time-badge">${v.time || ''}</div>
+      </div>
+      <div class="visit-meta">
+        <div class="visit-meta-item">📅 ${v.date || ''}</div>
+        ${labours > 0 ? `<div class="labour-badge">👷 ${labours} Labour${labours!=1?'s':''}</div>` : '<span class="visit-meta-item">👤 Solo Visit</span>'}
+        ${v.locationName ? `<div class="visit-meta-item" style="font-size:11px;color:#94a3b8">📍 ${(v.locationName).substring(0,40)}${v.locationName.length>40?'...':''}</div>` : ''}
+      </div>
+      <div class="visit-att-id">${v.attendanceId || v.attId || ''}</div>
+    </div>`;
+  }).join('');
+}
+
+</script>
+
+<!--
+═══════════════════════════════════════════════════════════════
+ GOOGLE APPS SCRIPT BACKEND — service-attendance.gs
+═══════════════════════════════════════════════════════════════
+Paste this into: Google Sheets → Extensions → Apps Script
+
+SETUP:
+1. Create a new Google Sheet
+2. Go to Extensions → Apps Script
+3. Paste this code → Save → Run `testSetup` → Allow permissions
+4. Deploy → New Deployment → Web App
+   - Execute as: Me
+   - Who has access: Anyone
+5. Copy Web App URL → paste as SCRIPT_URL in index.html
+6. Push index.html to GitHub → Enable GitHub Pages
+
+---
+
+const SHEET_NAME = 'Attendance Check-In Log';
+const SELFIE_FOLDER = 'Service Team Attendance Selfies';
+const LABOURS_FOLDER = 'Labour Attendance Photo';
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    if (data.action === 'checkin') return handleCheckin(data, e);
+    return respond({ success: false, error: 'Unknown action' });
+  } catch(err) {
+    return respond({ success: false, error: err.toString() });
+  }
+}
+
+function handleCheckin(data, e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) sheet = createSheet(ss);
+
+  // Save selfie
+  let selfieLink = '';
+  if (data.selfieBase64) {
+    selfieLink = savePhoto(data.selfieBase64, `${data.empName}_${data.date}_${data.time.replace(/[: ]/g,'')}.jpg`, SELFIE_FOLDER);
+  }
+
+  // Save labours photo
+  let laboursLink = '';
+  if (data.laboursBase64) {
+    laboursLink = savePhoto(data.laboursBase64, `${data.siteName}_${data.date}_${data.time.replace(/[: ]/g,'')}.jpg`, LABOURS_FOLDER);
+  }
+
+  // Get IP
+  const ip = e && e.parameter && e.parameter.ip ? e.parameter.ip : 'N/A';
+
+  // Append row
+  const lastRow = sheet.getLastRow();
+  const newRow = lastRow + 1;
+  sheet.appendRow([
+    data.attendanceId,
+    new Date(data.date.split('-').reverse().join('-')),
+    data.time,
+    data.empName,
+    data.siteName,
+    data.numLabours,
+    data.fingerprint,
+    ip,
+    data.battery,
+    data.locationName,
+    data.lat,
+    data.lng,
+    selfieLink,
+    laboursLink,
+  ]);
+
+  // Format row
+  const rowRange = sheet.getRange(newRow, 1, 1, 14);
+  const bg = (newRow % 2 === 0) ? '#f0f4ff' : '#ffffff';
+  rowRange.setBackground(bg);
+
+  // Format date and time columns
+  sheet.getRange(newRow, 2).setNumberFormat('DD-MM-YYYY');
+  sheet.getRange(newRow, 3).setNumberFormat('HH:MM:SS AM/PM');
+  sheet.getRange(newRow, 6).setNumberFormat('#,##0');
+
+  return respond({ success: true, driveLink: selfieLink });
+}
+
+function savePhoto(base64Data, filename, folderName) {
+  const cleanBase64 = base64Data.replace(/^data:image\/\w+;base64,/, '');
+  const blob = Utilities.newBlob(Utilities.base64Decode(cleanBase64), 'image/jpeg', filename);
+  const folders = DriveApp.getFoldersByName(folderName);
+  const folder = folders.hasNext() ? folders.next() : DriveApp.createFolder(folderName);
+  const file = folder.createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return file.getUrl();
+}
+
+function doGet(e) {
+  const action = e.parameter.action;
+  if (action === 'getattendance') {
+    const fp = e.parameter.fp;
+    return respondGet(getAttendanceByFP(fp));
+  }
+  return respondGet({ status: 'ok', message: 'Service Team Attendance API is running.' });
+}
+
+function getAttendanceByFP(fp) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) return { rows: [] };
+
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const fpIdx = headers.indexOf('Device Fingerprint');
+  if (fpIdx === -1) return { rows: [] };
+
+  const rows = [];
+  for (let i = data.length - 1; i >= 1; i--) {
+    const row = data[i];
+    if (row[fpIdx] === fp) {
+      rows.push({
+        attendanceId: row[0],
+        date: row[1] instanceof Date ? Utilities.formatDate(row[1], Session.getScriptTimeZone(), 'dd-MM-yyyy') : row[1],
+        time: row[2],
+        empName: row[3],
+        siteName: row[4],
+        numLabours: row[5],
+        fingerprint: row[6],
+        locationName: row[9],
+        lat: row[10],
+        lng: row[11],
+        selfieLink: row[12],
+        laboursLink: row[13],
+      });
+    }
+  }
+  return { rows };
+}
+
+function createSheet(ss) {
+  const sheet = ss.insertSheet(SHEET_NAME);
+  const headers = [
+    'Attendance ID', 'Date', 'Time', 'Employee Name', 'Site Name',
+    'Number of Labour', 'Device Fingerprint', 'IP Address', 'Battery Level',
+    'Check-In Location', 'Latitude', 'Longitude', 'Selfie Drive Link', 'Labours Photo Drive Link'
+  ];
+  const headerRange = sheet.getRange(1, 1, 1, headers.length);
+  headerRange.setValues([headers]);
+  headerRange.setBackground('#0a1f44');
+  headerRange.setFontColor('#ffffff');
+  headerRange.setFontFamily('Nunito');
+  headerRange.setFontWeight('bold');
+  headerRange.setFontSize(11);
+  sheet.setFrozenRows(1);
+  sheet.setColumnWidths(1, headers.length, 180);
+  return sheet;
+}
+
+function respond(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+function respondGet(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function testSetup() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) sheet = createSheet(ss);
+  const selfieFolder = DriveApp.getFoldersByName(SELFIE_FOLDER).hasNext()
+    ? DriveApp.getFoldersByName(SELFIE_FOLDER).next()
+    : DriveApp.createFolder(SELFIE_FOLDER);
+  const laboursFolder = DriveApp.getFoldersByName(LABOURS_FOLDER).hasNext()
+    ? DriveApp.getFoldersByName(LABOURS_FOLDER).next()
+    : DriveApp.createFolder(LABOURS_FOLDER);
+  Logger.log('✅ Sheet: ' + sheet.getName());
+  Logger.log('✅ Selfie Folder: ' + selfieFolder.getName());
+  Logger.log('✅ Labours Folder: ' + laboursFolder.getName());
+  Logger.log('✅ Setup complete!');
+}
+
+═══════════════════════════════════════════════════════════════
+ END APPS SCRIPT
+═══════════════════════════════════════════════════════════════
+-->
+</body>
+</html>
